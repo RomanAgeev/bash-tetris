@@ -9,7 +9,7 @@ _render_shape() {
 
     local width="${shape%% *}"
     if ! valid_int "$width"; then
-        printf "ERROR\n" >&2
+        printf "Shape width \"%s\" is not number\n" "$width" >&2
         return 1
     fi
 
@@ -17,19 +17,17 @@ _render_shape() {
     local length="${#body}"
 
     if [ $(( $length % $width )) -ne 0 ]; then
-        printf "ERROR_2\n" >&2
+        printf "Shape is not rectangular\n" >&2
         return 1
     fi
 
     local height=$(( $length / $width ))
 
     local format
-    local line_format
-    local i=0
     for (( i=0; i<$height; i++ )); do
         local offset=$(( $i * $width ))
         local line="${body:$offset:$width}"
-        line_format="${line//[^.]/%s}"
+        local line_format="${line//[^.]/%s}"
         line_format="${line_format//./ %.0s}"
         format="$format$line_format\n"
     done
