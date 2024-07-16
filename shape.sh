@@ -5,6 +5,7 @@ source ./utils/_main.sh
 new_shape() {
     local this="${1:?}"
     local string="${2:?}"
+    local placeholder="${3:-X}"
 
     local width="${string%% *}"
     if ! valid_int "$width"; then
@@ -31,7 +32,7 @@ new_shape() {
         format="$format$line_format\n"
     done
 
-    fill_array "$length" "G"
+    fill_array "$length" "$placeholder"
 
     set_field "$this" width "$width"
     set_field "$this" height "$height"
