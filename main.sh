@@ -2,7 +2,6 @@
 
 set -euo pipefail
 
-source ./utils/_main.sh
 source ./shape.sh
 
 new_shape shape_o "2 xxxx"

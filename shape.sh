@@ -1,5 +1,7 @@
 #!/bin/bash
 
+source ./utils/_main.sh
+
 new_shape() {
     local this="${1:?}"
     local string="${2:?}"
