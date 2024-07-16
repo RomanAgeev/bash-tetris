@@ -15,3 +15,17 @@ set_field() {
         return 1
     fi
 }
+
+get_scalar_field() {
+    local this="${1:?}"
+    local field="${2:?}"
+
+    eval "$field=\$${this}__$field"
+}
+
+get_array_field() {
+    local this="${1:?}"
+    local field="${2:?}"
+
+    eval "$field=( \"\${${this}__$field[@]}\" )"
+}

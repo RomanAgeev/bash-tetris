@@ -40,8 +40,8 @@ new_shape() {
 render_shape() {
     local this="${1:?}"
 
-    local format; eval "format=\$${this}__format"
-    local array; eval "array=( \"\${${this}__array[@]}\" )"
+    local format; get_scalar_field "$this" format
+    local array; get_array_field "$this" array
 
     printf "$format" "${array[@]}"
 }
