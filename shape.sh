@@ -2,10 +2,21 @@
 
 source ./utils/_main.sh
 
+shape_classname=shape
+
+set_shape_default_placeholder() {
+    set_field "$shape_classname" default_placeholder "${1:?}"
+}
+
+get_shape_default_placeholder() {
+    get_scalar_field "$shape_classname" default_placeholder
+}
+
 new_shape() {
     local this="${1:?}"
     local string="${2:?}"
-    local placeholder="${3:-X}"
+    local default_placeholder; get_shape_default_placeholder
+    local placeholder="${3:-$default_placeholder}"
 
     local width="${string%% *}"
     if ! valid_int "$width"; then
@@ -48,3 +59,5 @@ render_shape() {
 
     printf "$format" "${array[@]}"
 }
+
+set_shape_default_placeholder X
