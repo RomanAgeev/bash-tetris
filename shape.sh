@@ -1,7 +1,7 @@
 #!/bin/bash
 
 new_shape() {
-    local name="${1:?}"
+    local this="${1:?}"
     local string="${2:?}"
 
     local width="${string%% *}"
@@ -31,17 +31,17 @@ new_shape() {
 
     fill_array "$length" "G"
 
-    eval "${name}__width=\$width"
-    eval "${name}__height=\$height"
-    eval "${name}__format=\"\$format\""
-    eval "${name}__array=( \"\${__FILL_ARRAY[@]}\" )"
+    set_field "$this" width "$width"
+    set_field "$this" height "$height"
+    set_field "$this" format "$format"
+    set_field "$this" array "${__FILL_ARRAY[@]}"
 }
 
 render_shape() {
-    local name="${1:?}"
+    local this="${1:?}"
 
-    local format; eval "format=\$${name}__format"
-    local array; eval "array=( \"\${${name}__array[@]}\" )"
+    local format; eval "format=\$${this}__format"
+    local array; eval "array=( \"\${${this}__array[@]}\" )"
 
     printf "$format" "${array[@]}"
 }

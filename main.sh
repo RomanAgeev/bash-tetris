@@ -20,3 +20,8 @@ render_shape shape_i; echo
 render_shape shape_t; echo
 render_shape shape_l; echo
 render_shape shape_s; echo
+
+echo "$shape_z__width"
+echo "$shape_z__height"
+echo "$shape_z__format"
+echo "${shape_z__array[@]}"
