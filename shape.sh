@@ -9,7 +9,7 @@ set_shape_default_placeholder() {
 }
 
 get_shape_default_placeholder() {
-    get_scalar_field "$shape_classname" default_placeholder
+    get_field "$shape_classname" default_placeholder
 }
 
 new_shape() {
@@ -41,13 +41,13 @@ new_shape() {
     set_field "$this" width "$width"
     set_field "$this" height "$height"
     set_field "$this" format "$format"
-    set_field "$this" array "${__FILL_ARRAY[@]}"
+    set_array_field "$this" array "${__FILL_ARRAY[@]}"
 }
 
 render_shape() {
     local this="${1:?}"
 
-    local format; get_scalar_field "$this" format
+    local format; get_field "$this" format
     local array; get_array_field "$this" array
 
     printf "$format" "${array[@]}"

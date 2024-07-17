@@ -1,31 +1,44 @@
 #!/bin/bash
 
+_field_name() {
+    printf -v __FIELD_NAME "%s__%s" "${1:?}" "${2:?}"
+}
+
 set_field() {
     local this="${1:?}"
     local field="${2:?}"
+    local value="${3:-}"
 
-    shift 2 
+    _field_name "$this" "$field"
 
-    if [ $# -gt 1 ]; then
-        eval "${this}__$field=( \"\$@\" )"
-    elif [ $# -eq 1 ]; then
-        eval "${this}__$field=\$1"
-    else
-        printf "Value for the field \"%s__%s\" is not provided" "$this" "$field" >&2
-        return 1
-    fi
+    eval "$__FIELD_NAME=\$value"
 }
 
-get_scalar_field() {
+get_field() {
     local this="${1:?}"
     local field="${2:?}"
 
-    eval "$field=\$${this}__$field"
+    _field_name "$this" "$field"
+
+    eval "$field=\$$__FIELD_NAME"
+}
+
+set_array_field() {
+    local this="${1:?}"
+    local field="${2:?}"
+
+    shift 2
+
+    _field_name "$this" "$field"
+
+    eval "$__FIELD_NAME=( \"\$@\" )"
 }
 
 get_array_field() {
     local this="${1:?}"
     local field="${2:?}"
 
-    eval "$field=( \"\${${this}__$field[@]}\" )"
+    _field_name "$this" "$field"
+
+    eval "$field=( \"\${$__FIELD_NAME[@]+\"\${$__FIELD_NAME[@]}\"}\" )"
 }
