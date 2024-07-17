@@ -64,7 +64,7 @@ add_format() {
 
     shift 2
 
-    _append_suffix "$this" "$format" "$@"
+    _append_suffix "$this" "$CUR_SAVE$format$CUR_RESTORE${CUR_DOWN//%s/}" "$@"
 }
 
 add_string() {

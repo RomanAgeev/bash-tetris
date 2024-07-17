@@ -1,6 +1,7 @@
 #!/bin/bash
 
 source ./utils/_main.sh
+source ./canvas.sh
 
 shape_classname=shape
 
@@ -22,7 +23,7 @@ new_shape() {
     IFS=' ' read -r -a lines <<< "$string"
 
     local width
-    local format
+    local format=()
     for line in "${lines[@]}"; do
         local line_width="${#line}"
         if [ $line_width -ne ${width:=$line_width} ]; then
@@ -31,7 +32,7 @@ new_shape() {
         fi
         local line_format="${line//[^.]/%s}"
         line_format="${line_format//./ %.0s}"
-        format="$format$line_format\n"
+        format+=( "$line_format" )
     done
 
     local height="${#lines[@]}"
@@ -40,17 +41,28 @@ new_shape() {
 
     set_field "$this" width "$width"
     set_field "$this" height "$height"
-    set_field "$this" format "$format"
+    set_array_field "$this" format "${format[@]}"
     set_array_field "$this" array "${__FILL_ARRAY[@]}"
 }
 
 render_shape() {
     local this="${1:?}"
+    local row="${2:?}"
+    local col="${3:?}"
 
-    local format; get_field "$this" format
+    local format; get_array_field "$this" format
     local array; get_array_field "$this" array
 
-    printf "$format" "${array[@]}"
+    local canvas="${this}_canvas"
+
+    new_canvas "$canvas"
+    cursor_at "$canvas" "$row" "$col"
+
+    for line in "${format[@]}"; do
+        add_format "$canvas" "$line"
+    done
+
+    render_canvas "$canvas" "${array[@]}"
 }
 
 set_shape_default_placeholder X

@@ -14,10 +14,12 @@ new_shape shape_t ".x. xxx"
 new_shape shape_l "..x xxx"
 new_shape shape_s ".xx xx."
 
-render_shape shape_o; echo
-render_shape shape_z; echo
-render_shape shape_j; echo
-render_shape shape_i; echo
-render_shape shape_t; echo
-render_shape shape_l; echo
-render_shape shape_s; echo
+clear
+
+render_shape shape_o 10 10
+render_shape shape_z 10 15
+render_shape shape_j 10 20
+render_shape shape_i 10 25
+render_shape shape_t 10 31
+render_shape shape_l 10 36
+render_shape shape_s 10 41
