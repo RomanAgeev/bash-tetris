@@ -26,7 +26,7 @@ new_shape() {
     for line in "${lines[@]}"; do
         local line_width="${#line}"
         if [ $line_width -ne ${width:=$line_width} ]; then
-            printf "Shape is not rectangular\n" >&2
+            printf "Shape \"%s\"is not rectangular\n" "$string" >&2
             return 1
         fi
         local line_format="${line//[^.]/%s}"
