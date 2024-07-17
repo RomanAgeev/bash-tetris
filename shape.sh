@@ -18,32 +18,25 @@ new_shape() {
     local default_placeholder; get_shape_default_placeholder
     local placeholder="${3:-$default_placeholder}"
 
-    local width="${string%% *}"
-    if ! valid_int "$width"; then
-        printf "Shape width \"%s\" is not a number\n" "$width" >&2
-        return 1
-    fi
+    local lines;
+    IFS=' ' read -r -a lines <<< "$string"
 
-    local body="${string#* }"
-
-    local length="${#body}"
-    if [ $(( $length % $width )) -ne 0 ]; then
-        printf "Shape is not rectangular\n" >&2
-        return 1
-    fi
-
-    local height=$(( $length / $width ))
-
+    local width
     local format
-    for (( i=0; i<$height; i++ )); do
-        local offset=$(( $i * $width ))
-        local line="${body:$offset:$width}"
+    for line in "${lines[@]}"; do
+        local line_width="${#line}"
+        if [ $line_width -ne ${width:=$line_width} ]; then
+            printf "Shape is not rectangular\n" >&2
+            return 1
+        fi
         local line_format="${line//[^.]/%s}"
         line_format="${line_format//./ %.0s}"
         format="$format$line_format\n"
     done
 
-    fill_array "$length" "$placeholder"
+    local height="${#lines[@]}"
+
+    fill_array $(( $width * $height )) "$placeholder"
 
     set_field "$this" width "$width"
     set_field "$this" height "$height"
