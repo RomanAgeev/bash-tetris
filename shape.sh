@@ -59,7 +59,7 @@ render_shape() {
     cursor_at "$canvas" "$row" "$col"
 
     for line in "${format[@]}"; do
-        add_format "$canvas" "$line"
+        add_format_line "$canvas" "$line"
     done
 
     render_canvas "$canvas" "${array[@]}"

@@ -13,8 +13,11 @@ CUR_SHOW="${CSI}?25h"
 CUR_ROW_COL="${CSI}%d;%dH"
 CUR_SAVE="${CSI}s"
 CUR_RESTORE="${CSI}u"
-CUR_UP="${CSI}%sA"
-CUR_DOWN="${CSI}%sB"
+CUR_UP_N="${CSI}%sA"
+CUR_DOWN_N="${CSI}%sB"
+
+printf -v CUR_UP "$CUR_UP_N" "1"
+printf -v CUR_DOWN "$CUR_DOWN_N" "1"
 
 new_canvas() {
     local this="${1:?}"
@@ -64,7 +67,7 @@ add_format() {
 
     shift 2
 
-    _append_suffix "$this" "$CUR_SAVE$format$CUR_RESTORE${CUR_DOWN//%s/}" "$@"
+    _append_suffix "$this" "$format" "$@"
 }
 
 add_string() {
@@ -72,6 +75,22 @@ add_string() {
     local string="${2:?}"
 
     add_format "$this" "%s" "$string"
+}
+
+add_format_line() {
+    local this="${1:?}"
+    local format="${2:?}"
+
+    shift 2
+
+    _append_suffix "$this" "$CUR_SAVE$format$CUR_RESTORE$CUR_DOWN" "$@"
+}
+
+add_string_line() {
+    local this="${1:?}"
+    local string="${2:?}"
+
+    add_format_line "$this" "%s" "$string"
 }
 
 render_canvas() {
