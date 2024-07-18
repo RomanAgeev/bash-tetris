@@ -3,23 +3,50 @@
 set -euo pipefail
 
 source ./shape.sh
+source ./shape_view.sh
 
 set_shape_default_placeholder O
 
-new_shape shape_o "xx xx"
-new_shape shape_z "xx. .xx"
-new_shape shape_j "x.. xxx"
-new_shape shape_i "xxxx"
+# new_shape shape_o "xx xx"
+# new_shape shape_z "xx. .xx"
+# new_shape shape_j "x.. xxx"
+# new_shape shape_i "xxxx"
+# new_shape shape_l "..x xxx"
+# new_shape shape_s ".xx xx."
+
 new_shape shape_t ".x. xxx"
-new_shape shape_l "..x xxx"
-new_shape shape_s ".xx xx."
+new_shape_view shape_view_t shape_t
 
 clear
 
-render_shape shape_o 10 10
-render_shape shape_z 10 15 1
-render_shape shape_j 10 20 2
-render_shape shape_i 10 25
-render_shape shape_t 10 31 3
-render_shape shape_l 10 36 6
-render_shape shape_s 10 41
+move_shape_view_at shape_view_t 30 30
+
+for i in {1..10}; do
+    sleep 0.1
+    move_shape_view_up shape_view_t
+done
+
+for i in {1..10}; do
+    sleep 0.1
+    move_shape_view_right shape_view_t
+done
+
+for i in {1..10}; do
+    sleep 0.1
+    move_shape_view_down shape_view_t
+done
+
+for i in {1..10}; do
+    sleep 0.1
+    move_shape_view_left shape_view_t
+done
+
+for i in {1..10}; do
+    sleep 0.5
+    rotate_shape_view_right shape_view_t
+done
+
+for i in {1..10}; do
+    sleep 0.5
+    rotate_shape_view_left shape_view_t
+done

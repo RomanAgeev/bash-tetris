@@ -12,10 +12,10 @@ fill_array() {
         return 1
     fi
 
-    local string="${2:?}"
+    local string="${2:- }"
 
     __FILL_ARRAY=()
     while [ ${#__FILL_ARRAY[@]} -lt $length ]; do
-        __FILL_ARRAY+=( $string )
+        __FILL_ARRAY+=( "$string" )
     done
 }

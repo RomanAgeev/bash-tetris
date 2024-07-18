@@ -95,6 +95,7 @@ new_shape() {
     done
 
     local height="${#lines[@]}"
+    local length=$(( $width * $height ))
 
     # 0-rotation format
     _shape_format "${lines[@]}"
@@ -115,14 +116,17 @@ new_shape() {
     _shape_format "${__SHAPE_LINES_3[@]}"
     set_array_field "$this" format_3 "${__SHAPE_FORMAT[@]}"
 
-    fill_array $(( $width * $height )) "$placeholder"
+    fill_array "$length" "$placeholder"
+    set_array_field "$this" placeholders "${__FILL_ARRAY[@]}"
+
+    fill_array "$length"
+    set_array_field "$this" spaces "${__FILL_ARRAY[@]}"
 
     set_field "$this" width "$width"
     set_field "$this" height "$height"
-    set_array_field "$this" array "${__FILL_ARRAY[@]}"
 }
 
-render_shape() {
+shape_canvas() {
     local this="${1:?}"
     local row="${2:?}"
     local col="${3:?}"
@@ -133,8 +137,6 @@ render_shape() {
     eval "local $format_field; get_array_field \$this $format_field"
     eval "local format=( \"\${$format_field[@]}\" )"
 
-    local array; get_array_field "$this" array
-
     local canvas="${this}_canvas"
 
     new_canvas "$canvas"
@@ -144,7 +146,21 @@ render_shape() {
         add_format_line "$canvas" "$line"
     done
 
-    render_canvas "$canvas" "${array[@]}"
+    __SHAPE_CANVAS="$canvas"
+}
+
+shape_placeholders() {
+    local this="${1:?}"
+
+    local placeholders; get_array_field "$this" placeholders
+    __SHAPE_PLACEHOLDERS=( "${placeholders[@]}" )
+}
+
+shape_spaces() {
+    local this="${1:?}"
+
+    local spaces; get_array_field "$this" spaces
+    __SHAPE_SPACES=( "${spaces[@]}" )
 }
 
 set_shape_default_placeholder X
