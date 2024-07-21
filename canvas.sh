@@ -2,7 +2,7 @@
 
 source ./utils/_main.sh
 
-shape_classname=canvas
+new_class canvas
 
 ESC=$'\e'
 CSI=$ESC[
@@ -22,7 +22,7 @@ printf -v CUR_DOWN "$CUR_DOWN_N" "1"
 new_canvas() {
     local this="${1:?}"
 
-    set_field "$this" body
+    set_canvas_field "$this" body
 }
 
 _append_suffix() {
@@ -36,8 +36,8 @@ _append_suffix() {
         && printf -v suffix "$format" "$@" \
         || suffix="$format"
 
-    local body; get_field "$this" body
-    set_field "$this" body "$body$suffix"
+    local body; get_canvas_field "$this" body
+    set_canvas_field "$this" body "$body$suffix"
 }
 
 hide_cursor() {
@@ -98,7 +98,7 @@ render_canvas() {
 
     shift 1
 
-    local body; get_field "$this" body
+    local body; get_canvas_field "$this" body
 
     printf "$body\n" "$@"
 }

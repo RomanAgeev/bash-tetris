@@ -3,14 +3,14 @@
 source ./utils/_main.sh
 source ./canvas.sh
 
-shape_classname=shape
+new_class shape
 
 set_shape_default_placeholder() {
-    set_field "$shape_classname" default_placeholder "${1:?}"
+    set_shape_static_field default_placeholder "${1:?}"
 }
 
 get_shape_default_placeholder() {
-    get_field "$shape_classname" default_placeholder
+    get_shape_static_field default_placeholder
 }
 
 _shape_format() {
@@ -99,31 +99,31 @@ new_shape() {
 
     # 0-rotation format
     _shape_format "${lines[@]}"
-    set_array_field "$this" format_0 "${__SHAPE_FORMAT[@]}"
+    set_shape_array_field "$this" format_0 "${__SHAPE_FORMAT[@]}"
 
     # 90-rotation format
     _shape_lines_1 "$width" "$height" "${lines[@]}"
     _shape_format "${__SHAPE_LINES_1[@]}"
-    set_array_field "$this" format_1 "${__SHAPE_FORMAT[@]}"
+    set_shape_array_field "$this" format_1 "${__SHAPE_FORMAT[@]}"
 
     # 180-rotation format
     _shape_lines_2 "$width" "$height" "${lines[@]}"
     _shape_format "${__SHAPE_LINES_2[@]}"
-    set_array_field "$this" format_2 "${__SHAPE_FORMAT[@]}"
+    set_shape_array_field "$this" format_2 "${__SHAPE_FORMAT[@]}"
 
     # 270-rotation format
     _shape_lines_3 "$width" "$height" "${lines[@]}"
     _shape_format "${__SHAPE_LINES_3[@]}"
-    set_array_field "$this" format_3 "${__SHAPE_FORMAT[@]}"
+    set_shape_array_field "$this" format_3 "${__SHAPE_FORMAT[@]}"
 
     fill_array "$length" "$placeholder"
-    set_array_field "$this" placeholders "${__FILL_ARRAY[@]}"
+    set_shape_array_field "$this" placeholders "${__FILL_ARRAY[@]}"
 
     fill_array "$length"
-    set_array_field "$this" spaces "${__FILL_ARRAY[@]}"
+    set_shape_array_field "$this" spaces "${__FILL_ARRAY[@]}"
 
-    set_field "$this" width "$width"
-    set_field "$this" height "$height"
+    set_shape_field "$this" width "$width"
+    set_shape_field "$this" height "$height"
 }
 
 shape_canvas() {
@@ -134,7 +134,7 @@ shape_canvas() {
 
     local format_field="format_${rotation}"
 
-    eval "local $format_field; get_array_field \$this $format_field"
+    eval "local $format_field; get_shape_array_field \$this $format_field"
     eval "local format=( \"\${$format_field[@]}\" )"
 
     local canvas="${this}_canvas"
@@ -152,14 +152,14 @@ shape_canvas() {
 shape_placeholders() {
     local this="${1:?}"
 
-    local placeholders; get_array_field "$this" placeholders
+    local placeholders; get_shape_array_field "$this" placeholders
     __SHAPE_PLACEHOLDERS=( "${placeholders[@]}" )
 }
 
 shape_spaces() {
     local this="${1:?}"
 
-    local spaces; get_array_field "$this" spaces
+    local spaces; get_shape_array_field "$this" spaces
     __SHAPE_SPACES=( "${spaces[@]}" )
 }
 

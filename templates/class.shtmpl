@@ -1,0 +1,53 @@
+_%%{class}_field_name() {
+    local this="${1:?}"
+    local field="${2:?}"
+
+    __FIELD_NAME="%%{class}__${this}__$field"
+}
+
+set_%%{class}_field() {
+    local this="${1:?}"
+    local field="${2:?}"
+    local value="${3:-}"
+
+    _%%{class}_field_name "$this" "$field"
+
+    eval "$__FIELD_NAME=\$value"
+}
+
+set_%%{class}_static_field() {
+    set_%%{class}_field %%{static} "$@"
+}
+
+get_%%{class}_field() {
+    local this="${1:?}"
+    local field="${2:?}"
+
+    _%%{class}_field_name "$this" "$field"
+
+    eval "$field=\$$__FIELD_NAME"
+}
+
+get_%%{class}_static_field() {
+    get_%%{class}_field %%{static} "$@"
+}
+
+set_%%{class}_array_field() {
+    local this="${1:?}"
+    local field="${2:?}"
+
+    shift 2
+
+    _%%{class}_field_name "$this" "$field"
+
+    eval "$__FIELD_NAME=( \"\$@\" )"
+}
+
+get_%%{class}_array_field() {
+    local this="${1:?}"
+    local field="${2:?}"
+
+    _%%{class}_field_name "$this" "$field"
+
+    eval "$field=( \"\${$__FIELD_NAME[@]+\"\${$__FIELD_NAME[@]}\"}\" )"
+}
