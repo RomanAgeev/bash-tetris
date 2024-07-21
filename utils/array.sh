@@ -1,7 +1,9 @@
 #!/bin/bash
 
 fill_array() {
-    local length="${1:?}"
+    local result="${1:?}"
+
+    local length="${2:?}"
     if ! valid_int "$length"; then
         printf "Array length \"%s\" is not a number\n" "$length" >&2
         return 1
@@ -12,10 +14,12 @@ fill_array() {
         return 1
     fi
 
-    local string="${2:- }"
+    local string="${3:- }"
 
-    __FILL_ARRAY=()
-    while [ ${#__FILL_ARRAY[@]} -lt $length ]; do
-        __FILL_ARRAY+=( "$string" )
+    local _array=()
+    while [ ${#_array[@]} -lt $length ]; do
+        _array+=( "$string" )
     done
+
+    eval "$result=( \"\${_array[@]}\" )"
 }

@@ -28,10 +28,10 @@ new_shape_view() {
 
     local shape_length; get_shape_length "$shape"
 
-    fill_array "$shape_length" "$placeholder"
-    set_shape_view_array_field "$this" placeholders "${__FILL_ARRAY[@]}"
-    fill_array "$shape_length"
-    set_shape_view_array_field "$this" spaces "${__FILL_ARRAY[@]}"
+    local placeholders; fill_array placeholders "$shape_length" "$placeholder"
+    set_shape_view_array_field "$this" placeholders "${placeholders[@]}"
+    local spaces; fill_array spaces "$shape_length"
+    set_shape_view_array_field "$this" spaces "${spaces[@]}"
 }
 
 _render_shape_view() {
