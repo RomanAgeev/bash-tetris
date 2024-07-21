@@ -4,6 +4,7 @@ set -euo pipefail
 
 source ./shape.sh
 source ./shape_view.sh
+source ./canvas.sh
 
 set_shape_view_default_placeholder O
 
@@ -14,39 +15,31 @@ set_shape_view_default_placeholder O
 # new_shape shape_l "..x xxx"
 # new_shape shape_s ".xx xx."
 
-new_shape shape_t ".x. xxx"
-new_shape_view shape_view_t shape_t
-
 clear
 
-move_shape_view_at shape_view_t 30 30
+new_canvas stage
+hide_cursor stage
+render_canvas stage
 
-for i in {1..10}; do
-    sleep 0.1
-    move_shape_view_up shape_view_t
-done
+new_shape shape ".x. xxx"
+new_shape_view view shape
+move_shape_view_at view 30 80
 
-for i in {1..10}; do
-    sleep 0.1
-    move_shape_view_right shape_view_t
-done
+while :; do
+    while :; do
+        read -sn 1 key
 
-for i in {1..10}; do
-    sleep 0.1
-    move_shape_view_down shape_view_t
-done
-
-for i in {1..10}; do
-    sleep 0.1
-    move_shape_view_left shape_view_t
-done
-
-for i in {1..10}; do
-    sleep 0.1
-    rotate_shape_view_right shape_view_t
-done
-
-for i in {1..10}; do
-    sleep 0.1
-    rotate_shape_view_left shape_view_t
+        case $key in
+            A) move_shape_view_up view; break ;;
+            B) move_shape_view_down view; break ;;
+            C) move_shape_view_right view; break ;;
+            D) move_shape_view_left view; break ;;
+            z|Z) rotate_shape_view_left view; break ;;
+            x|X) rotate_shape_view_right view; break ;;
+            q) new_canvas final
+                show_cursor final
+                render_canvas final
+                echo; exit ;;
+        esac
+    done
 done
