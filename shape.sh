@@ -10,7 +10,7 @@ get_shape_length() {
     local result="${2:-shape_length}"
 
     local length; get_shape_field "$this" length
-    eval "$result=\$length"
+    eval "$result=\"\$length\""
 }
 
 _shape_format() {
@@ -119,18 +119,19 @@ new_shape() {
     set_shape_field "$this" length "$length"
 }
 
-shape_canvas() {
+build_shape_canvas() {
     local this="${1:?}"
     local row="${2:?}"
     local col="${3:?}"
     local rotation=$(( ${4:-0} % 4 ))
+    local result="${5:-shape_canvas}"
 
     local format_field="format_${rotation}"
 
     eval "local $format_field; get_shape_array_field \$this $format_field"
     eval "local format=( \"\${$format_field[@]}\" )"
 
-    local canvas="${this}_canvas"
+    local canvas; _shape_field_name "$this" canvas
 
     new_canvas "$canvas"
     cursor_at "$canvas" "$row" "$col"
@@ -139,5 +140,5 @@ shape_canvas() {
         add_format_line "$canvas" "$line"
     done
 
-    __SHAPE_CANVAS="$canvas"
+    eval "$result=\"\$canvas\"" 
 }

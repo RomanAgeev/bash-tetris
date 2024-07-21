@@ -49,10 +49,10 @@ _render_shape_view() {
         render_canvas "$canvas" "${spaces[@]}"
     fi
 
-    shape_canvas "$shape" "$row" "$col" "$rotation"
-    set_shape_view_field "$this" canvas "$__SHAPE_CANVAS"
+    local shape_canvas; build_shape_canvas "$shape" "$row" "$col" "$rotation"
+    render_canvas "$shape_canvas" "${placeholders[@]}"
 
-    render_canvas "$__SHAPE_CANVAS" "${placeholders[@]}"
+    set_shape_view_field "$this" canvas "$shape_canvas"
 }
 
 move_shape_view_at() {
