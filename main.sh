@@ -5,7 +5,7 @@ set -euo pipefail
 source ./shape.sh
 source ./shape_view.sh
 
-set_shape_default_placeholder O
+set_shape_view_default_placeholder O
 
 # new_shape shape_o "xx xx"
 # new_shape shape_z "xx. .xx"
@@ -42,11 +42,11 @@ for i in {1..10}; do
 done
 
 for i in {1..10}; do
-    sleep 0.5
+    sleep 0.1
     rotate_shape_view_right shape_view_t
 done
 
 for i in {1..10}; do
-    sleep 0.5
+    sleep 0.1
     rotate_shape_view_left shape_view_t
 done

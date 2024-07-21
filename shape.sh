@@ -5,12 +5,12 @@ source ./canvas.sh
 
 new_class shape
 
-set_shape_default_placeholder() {
-    set_shape_static_field default_placeholder "${1:?}"
-}
+get_shape_length() {
+    local this="${1:?}"
+    local result="${2:-shape_length}"
 
-get_shape_default_placeholder() {
-    get_shape_static_field default_placeholder
+    local length; get_shape_field "$this" length
+    eval "$result=\$length"
 }
 
 _shape_format() {
@@ -79,8 +79,6 @@ _shape_lines_3() {
 new_shape() {
     local this="${1:?}"
     local string="${2:?}"
-    local default_placeholder; get_shape_default_placeholder
-    local placeholder="${3:-$default_placeholder}"
 
     local lines;
     IFS=' ' read -r -a lines <<< "$string"
@@ -116,14 +114,9 @@ new_shape() {
     _shape_format "${__SHAPE_LINES_3[@]}"
     set_shape_array_field "$this" format_3 "${__SHAPE_FORMAT[@]}"
 
-    fill_array "$length" "$placeholder"
-    set_shape_array_field "$this" placeholders "${__FILL_ARRAY[@]}"
-
-    fill_array "$length"
-    set_shape_array_field "$this" spaces "${__FILL_ARRAY[@]}"
-
     set_shape_field "$this" width "$width"
     set_shape_field "$this" height "$height"
+    set_shape_field "$this" length "$length"
 }
 
 shape_canvas() {
@@ -148,19 +141,3 @@ shape_canvas() {
 
     __SHAPE_CANVAS="$canvas"
 }
-
-shape_placeholders() {
-    local this="${1:?}"
-
-    local placeholders; get_shape_array_field "$this" placeholders
-    __SHAPE_PLACEHOLDERS=( "${placeholders[@]}" )
-}
-
-shape_spaces() {
-    local this="${1:?}"
-
-    local spaces; get_shape_array_field "$this" spaces
-    __SHAPE_SPACES=( "${spaces[@]}" )
-}
-
-set_shape_default_placeholder X

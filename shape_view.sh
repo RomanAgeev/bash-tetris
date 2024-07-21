@@ -6,15 +6,32 @@ source ./shape.sh
 
 new_class shape_view
 
+set_shape_view_default_placeholder() {
+    set_shape_view_static_field default_placeholder "${1:?}"
+}
+
+get_shape_view_default_placeholder() {
+    get_shape_view_static_field default_placeholder
+}
+
 new_shape_view() {
     local this="${1:?}"
     local shape="${2:?}"
+    local default_placeholder; get_shape_view_default_placeholder
+    local placeholder="${3:-$default_placeholder}"
 
     set_shape_view_field "$this" shape "$shape"
     set_shape_view_field "$this" canvas
     set_shape_view_field "$this" row 0
     set_shape_view_field "$this" col 0
     set_shape_view_field "$this" rotation 0
+
+    local shape_length; get_shape_length "$shape"
+
+    fill_array "$shape_length" "$placeholder"
+    set_shape_view_array_field "$this" placeholders "${__FILL_ARRAY[@]}"
+    fill_array "$shape_length"
+    set_shape_view_array_field "$this" spaces "${__FILL_ARRAY[@]}"
 }
 
 _render_shape_view() {
@@ -25,18 +42,17 @@ _render_shape_view() {
     local row; get_shape_view_field "$this" row
     local col; get_shape_view_field "$this" col
     local rotation; get_shape_view_field "$this" rotation
+    local placeholders; get_shape_view_array_field "$this" placeholders
+    local spaces; get_shape_view_array_field "$this" spaces
 
     if [ -n "$canvas" ]; then
-        shape_spaces "$shape"
-        render_canvas "$canvas" "${__SHAPE_SPACES[@]}"
+        render_canvas "$canvas" "${spaces[@]}"
     fi
 
     shape_canvas "$shape" "$row" "$col" "$rotation"
-    shape_placeholders "$shape"
-
-    render_canvas "$__SHAPE_CANVAS" "${__SHAPE_PLACEHOLDERS[@]}"
-
     set_shape_view_field "$this" canvas "$__SHAPE_CANVAS"
+
+    render_canvas "$__SHAPE_CANVAS" "${placeholders[@]}"
 }
 
 move_shape_view_at() {
@@ -109,3 +125,5 @@ rotate_shape_view_left() {
 
     _render_shape_view "$this"
 }
+
+set_shape_view_default_placeholder X
