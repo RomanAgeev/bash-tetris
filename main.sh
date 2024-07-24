@@ -1,45 +1,52 @@
 #!/bin/bash
 
-set -euo pipefail
+set -uo pipefail
 
 source ./shape.sh
 source ./shape_view.sh
 source ./canvas.sh
+source ./loop.sh
 
 set_shape_view_default_placeholder O
 
-# new_shape shape_o "xx xx"
-# new_shape shape_z "xx. .xx"
-# new_shape shape_j "x.. xxx"
-# new_shape shape_i "xxxx"
-# new_shape shape_l "..x xxx"
-# new_shape shape_s ".xx xx."
-
-clear
-
 new_canvas stage
 hide_cursor stage
+new_canvas final
+show_cursor final
+
+clear
 render_canvas stage
+
+# new_shape shape "xx xx"
+# new_shape shape "xx. .xx"
+# new_shape shape "x.. xxx"
+# new_shape shape "xxxx"
+# new_shape shape "..x xxx"
+# new_shape shape ".xx xx."
 
 new_shape shape ".x. xxx"
 new_shape_view view shape
-move_shape_view_at view 30 80
+move_shape_view_at view 10 80
 
-while :; do
-    while :; do
-        read -sn 1 key
+_loop_handler() {
+    local key="${1:?}"
 
-        case $key in
-            A) move_shape_view_up view; break ;;
-            B) move_shape_view_down view; break ;;
-            C) move_shape_view_right view; break ;;
-            D) move_shape_view_left view; break ;;
-            z|Z) rotate_shape_view_left view; break ;;
-            x|X) rotate_shape_view_right view; break ;;
-            q) new_canvas final
-                show_cursor final
-                render_canvas final
-                echo; exit ;;
-        esac
-    done
-done
+    case $key in
+        A) move_shape_view_up view ;;
+        B) move_shape_view_down view ;;
+        C) move_shape_view_right view ;;
+        D) move_shape_view_left view ;;
+        z|Z) rotate_shape_view_left view ;;
+        x|X) rotate_shape_view_right view ;;
+        q) exit ;;
+        *) return 1 ;;
+    esac
+}
+
+_timeout_handler() {
+    move_shape_view_down view 1
+}
+
+trap "render_canvas final; echo" EXIT
+
+loop _loop_handler _timeout_handler 500
