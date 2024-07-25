@@ -50,3 +50,10 @@ set_background() {
 
     printf "$SET_BG" "$color"
 }
+
+get_window_size() {
+    local wresult=${1:?}
+    local hresult=${2:?}
+
+    shopt -s checkwinsize; (:); eval "$wresult=\$COLUMNS; $hresult=\$LINES"
+}
