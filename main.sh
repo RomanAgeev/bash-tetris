@@ -2,11 +2,13 @@
 
 set -uo pipefail
 
+source ./utils/_main.sh
 source ./shape.sh
 source ./shape_view.sh
 source ./canvas.sh
 source ./loop.sh
-source ./utils/_main.sh
+
+require bc
 
 set_shape_view_default_placeholder O
 
