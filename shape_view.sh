@@ -27,7 +27,7 @@ new_shape_view() {
     set_shape_view_field "$this" rotation 0
     set_shape_view_field "$this" color "$WHITE"
 
-    set_shape_view_field "$this" "render_enabled" "NO"
+    set_shape_view_field "$this" render_enabled "$NO"
 
     local shape_length; get_shape_length "$shape"
 
@@ -41,7 +41,7 @@ _render_shape_view() {
     local this="${1:?}"
 
     local render_enabled; get_shape_view_field "$this" render_enabled
-    [ "$render_enabled" == "YES" ] || return 0
+    [ "$render_enabled" == "$YES" ] || return 0
 
     local canvas; get_shape_view_field "$this" canvas
     local shape; get_shape_view_field "$this" shape
@@ -66,8 +66,8 @@ enabled_shape_view_render() {
     local this="${1:?}"
 
     local render_enabled; get_shape_view_field "$this" render_enabled
-    [ "$render_enabled" == "NO" ] && {
-        set_shape_view_field "$this" render_enabled YES
+    [ "$render_enabled" == "$NO" ] && {
+        set_shape_view_field "$this" render_enabled "$YES"
         _render_shape_view "$this"
     }
 }
@@ -76,7 +76,7 @@ disable_shape_view_render() {
     local this="${1:?}"
 
     local render_enabled; get_shape_view_field "$this" render_enabled
-    [ "$render_enabled" == "YES" ] && set_shape_view_field "$this" render_enabled NO
+    [ "$render_enabled" == "$YES" ] && set_shape_view_field "$this" render_enabled "$NO"
 }
 
 move_shape_view_at() {

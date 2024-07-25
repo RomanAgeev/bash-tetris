@@ -22,3 +22,6 @@ source $my_path/screen.sh
 
 # shellcheck source=/dev/null
 source $my_path/require.sh
+
+# shellcheck source=/dev/null
+source $my_path/constants.sh
