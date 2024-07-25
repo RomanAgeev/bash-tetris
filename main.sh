@@ -6,16 +6,12 @@ source ./shape.sh
 source ./shape_view.sh
 source ./canvas.sh
 source ./loop.sh
+source ./utils/_main.sh
 
 set_shape_view_default_placeholder O
 
-new_canvas stage
-hide_cursor stage
-new_canvas final
-show_cursor final
-
 clear
-render_canvas stage
+hide_cursor
 
 # new_shape shape "xx xx"
 # new_shape shape "xx. .xx"
@@ -49,6 +45,6 @@ _timeout_handler() {
     move_shape_view_down view 1
 }
 
-trap "render_canvas final; echo" EXIT
+trap "show_cursor; echo" EXIT
 
 loop _loop_handler _timeout_handler 500

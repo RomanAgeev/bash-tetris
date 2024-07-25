@@ -150,10 +150,10 @@ build_shape_canvas() {
     local canvas; _shape_field_name "$this" canvas
 
     new_canvas "$canvas"
-    set_foreground "$canvas" "$color"
-    cursor_at "$canvas" "$row" "$col"
+    set_canvas_foreground "$canvas" "$color"
+    canvas_cursor_at "$canvas" "$row" "$col"
     for line in "${format[@]}"; do
-        add_format_line "$canvas" "$line"
+        add_canvas_format_line "$canvas" "$line"
     done
 
     eval "$result=\"\$canvas\"" 
