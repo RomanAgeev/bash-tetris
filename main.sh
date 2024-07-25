@@ -26,7 +26,9 @@ render_canvas stage
 
 new_shape shape ".x. xxx"
 new_shape_view view shape
+set_shape_view_color view "$CYAN"
 move_shape_view_at view 10 80
+enabled_shape_view_render view
 
 _loop_handler() {
     local key="${1:?}"

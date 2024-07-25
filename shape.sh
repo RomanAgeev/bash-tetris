@@ -138,8 +138,9 @@ build_shape_canvas() {
     local this="${1:?}"
     local row="${2:?}"
     local col="${3:?}"
-    local rotation=$(( ${4:-0} % 4 ))
-    local result="${5:-shape_canvas}"
+    local rotation=$(( ${4:?} % 4 ))
+    local color="${5:?}"
+    local result="${6:-shape_canvas}"
 
     local format_field="format_${rotation}"
 
@@ -149,8 +150,8 @@ build_shape_canvas() {
     local canvas; _shape_field_name "$this" canvas
 
     new_canvas "$canvas"
+    set_foreground "$canvas" "$color"
     cursor_at "$canvas" "$row" "$col"
-
     for line in "${format[@]}"; do
         add_format_line "$canvas" "$line"
     done

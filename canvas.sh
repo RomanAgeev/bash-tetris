@@ -19,10 +19,27 @@ CUR_DOWN_N="${CSI}%sB"
 printf -v CUR_UP "$CUR_UP_N" "1"
 printf -v CUR_DOWN "$CUR_DOWN_N" "1"
 
+BLACK=0
+RED=1
+GREEN=2
+YELLOW=3
+BLUE=4
+MAGENTA=5
+CYAN=6
+WHITE=7
+
+FG=3
+BG=4
+
+SET_BG="${CSI}${BG}%dm"
+SET_FG="${CSI}${FG}%dm"
+
 new_canvas() {
     local this="${1:?}"
+    local neutral_color="${2:-$BLACK}"
 
     set_canvas_field "$this" body
+    set_canvas_field "$this" neutral_color "$neutral_color"
 }
 
 _append_suffix() {
@@ -40,6 +57,26 @@ _append_suffix() {
     set_canvas_field "$this" body "$body$suffix"
 }
 
+set_foreground() {
+    local this="${1:?}"
+    local color="${2:?}"
+
+    local suffix
+    printf -v suffix "$SET_FG" "$color"
+
+    _append_suffix "$this" "$suffix"
+}
+
+set_background() {
+    local this="${1:?}"
+    local color="${2:?}"
+
+    local suffix
+    printf -v suffix "$SET_BG" "$color"
+
+    _append_suffix "$this" "$suffix"
+}
+
 hide_cursor() {
     local this="${1:?}"
 
@@ -50,7 +87,6 @@ show_cursor() {
     local this="${1:?}"
 
     _append_suffix "$this" "$CUR_SHOW"
-
 }
 
 cursor_at() {
@@ -99,6 +135,8 @@ render_canvas() {
     shift 1
 
     local body; get_canvas_field "$this" body
+    local neutral_color; get_canvas_field "$this" neutral_color
+    printf -v neutral_foreground "$SET_FG" "$neutral_color"
 
-    printf "$body\n" "$@"
+    printf "$body$neutral_foreground\n" "$@"
 }
