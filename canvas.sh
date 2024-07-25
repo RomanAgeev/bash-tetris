@@ -6,10 +6,8 @@ new_class canvas
 
 new_canvas() {
     local this="${1:?}"
-    local neutral_color="${2:-$BLACK}"
 
     set_canvas_field "$this" body
-    set_canvas_field "$this" neutral_color "$neutral_color"
 }
 
 _append_canvas_suffix() {
@@ -95,7 +93,6 @@ render_canvas() {
     local body; get_canvas_field "$this" body 
     printf "$body\n" "$@"
 
-    local neutral_color; get_canvas_field "$this" neutral_color
-    set_foreground "$neutral_color"
-    set_background "$neutral_color"
+    set_foreground "$NEUTRAL"
+    set_background "$NEUTRAL"
 }

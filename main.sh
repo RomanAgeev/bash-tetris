@@ -11,6 +11,8 @@ source ./loop.sh
 require bc
 
 set_shape_view_default_placeholder O
+set_foreground "$NEUTRAL"
+set_background "$NEUTRAL"
 
 clear
 hide_cursor
