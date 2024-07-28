@@ -52,3 +52,11 @@ get_%%{class}_array_field() {
 
     eval "$field=( \"\${$field_name[@]+\"\${$field_name[@]}\"}\" )"
 }
+
+free_%%{class}() {
+    local this="${1:?}"
+
+    for var in $(compgen -v "%%{class}__${this}__"); do
+        unset "$var"
+    done
+}
