@@ -37,6 +37,33 @@ new_shape_view() {
     set_shape_view_array_field "$this" spaces "${spaces[@]}"
 }
 
+get_shape_view_col() {
+    local this="${1:?}"
+    local result="${2:?}"
+
+    local col; get_shape_view_field "$this" col
+
+    eval "$result=\$col"
+}
+
+get_shape_view_row() {
+    local this="${1:?}"
+    local result="${2:?}"
+
+    local col; get_shape_view_field "$this" row
+
+    eval "$result=\$row"
+}
+
+get_shape_view_rotation() {
+    local this="${1:?}"
+    local result="${2:?}"
+
+    local rotation; get_shape_view_field "$this" rotation
+
+    eval "$result=\$rotation"
+}
+
 _render_shape_view() {
     local this="${1:?}"
 

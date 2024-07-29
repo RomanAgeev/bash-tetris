@@ -34,6 +34,31 @@ new_stage() {
     set_stage_field "$this" height "$height"
 }
 
+get_stage_bottom() {
+    local this="${1:?}"
+    local result="${2:?}"
+
+    local row; get_stage_field "$this" row
+    local height; get_stage_field "$this" height
+
+    eval "$result=\$(( \$row + \$height ))"
+}
+
+get_stage_start_position() {
+    local this="${1:?}"
+    local result_row="${2:?}"
+    local result_col="${3:?}"
+
+    local row; get_stage_field "$this" row
+    local col; get_stage_field "$this" col
+    local width; get_stage_field "$this" width
+
+    local start_col=$(( $col + $width / 2 - 1 ))
+
+    eval "$result_row=\$row"
+    eval "$result_col=\$start_col"
+}
+
 render_stage() {
     local this="${1:?}"
 

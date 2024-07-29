@@ -13,6 +13,34 @@ get_shape_length() {
     eval "$result=\"\$length\""
 }
 
+get_shape_actual_width() {
+    local this="${1:?}"
+    local rotation=$(( ${2:?} % 4 ))
+    local result="${3:?}"
+
+    local width; get_shape_field "$this" width
+    local height; get_shape_field "$this" height
+
+    local _actual_width;
+    [ $(( $rotation % 2 )) -eq 0 ] && _actual_width="$width" || _actual_width="$height"
+
+    eval "$result=\$_actual_width"
+}
+
+get_shape_actual_height() {
+    local this="${1:?}"
+    local rotation=$(( ${2:?} % 4 ))
+    local result="${3:?}"
+
+    local width; get_shape_field "$this" width
+    local height; get_shape_field "$this" height
+
+    local _actual_height;
+    [ $(( $rotation % 2 )) -eq 0 ] && _actual_height="$height" || _actual_height="$width"
+
+    eval "$result=\$_actual_height"
+}
+
 _get_shape_format() {
     local result="${1:?}"
 
