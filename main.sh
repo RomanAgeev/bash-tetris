@@ -16,6 +16,7 @@ set_foreground "$NEUTRAL"
 set_background "$NEUTRAL"
 
 shapes=("xx xx" "xx. .xx" "x.. xxx" "xxxx" "..x xxx" ".xx xx." ".x. xxx")
+colors=("$RED" "$GREEN" "$YELLOW" "$BLUE" "$MAGENTA" "$CYAN" "$WHITE")
 
 clear
 hide_cursor
@@ -28,9 +29,13 @@ _new_shape() {
     free_shape_view view
 
     local shape_index=$(( $RANDOM % ${#shapes[@]} ))
+    local color_index=$(( $RANDOM % ${#colors[@]} ))
 
     new_shape shape "${shapes[$shape_index]}"
     start_stage_shape stage shape view
+
+    set_shape_view_color view "${colors[$color_index]}"
+    enabled_shape_view_render view
 }
 
 _loop_handler() {

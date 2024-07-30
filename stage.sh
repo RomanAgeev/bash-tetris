@@ -42,15 +42,11 @@ start_stage_shape() {
 
     new_shape_view "$shape_view" "$shape"
 
-    local color_index=$(( $RANDOM % ${#colors[@]} ))
-    set_shape_view_color "$shape_view" "${colors[$color_index]}"
-
     local row; get_stage_field "$this" row
     local col; get_stage_field "$this" col
     local width; get_stage_field "$this" width
     local start_col=$(( $col + $width / 2 - 1 ))
 
-    enabled_shape_view_render "$shape_view"
     move_shape_view_at "$shape_view" $row $start_col
 }
 
