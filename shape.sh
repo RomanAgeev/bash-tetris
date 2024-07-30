@@ -167,9 +167,7 @@ new_shape() {
 free_shape() {
     local this="${1:?}"
 
-    if __exist_shape "$this"; then
-        __free_shape "$this"
-    fi
+    __exist_shape "$this" && __free_shape "$this"
 }
 
 build_shape_canvas() {

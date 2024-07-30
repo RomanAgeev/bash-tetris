@@ -40,9 +40,7 @@ new_stage() {
 free_stage() {
     local this="${1:?}"
 
-    if __exist_stage "$this"; then
-        __free_stage "$this"
-    fi
+    __exist_stage "$this" && __free_stage "$this"
 }
 
 start_stage_shape() {

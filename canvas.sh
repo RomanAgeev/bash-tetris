@@ -15,9 +15,7 @@ new_canvas() {
 free_canvas() {
     local this="${1:?}"
 
-    if __exist_canvas "$this"; then
-        __free_canvas "$this"
-    fi
+    __exist_canvas "$this" && __free_canvas "$this"
 }
 
 _append_canvas_suffix() {

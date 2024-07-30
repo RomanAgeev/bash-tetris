@@ -42,13 +42,15 @@ new_shape_view() {
 free_shape_view() {
     local this="${1:?}"
 
-    if __exist_shape_view "$this"; then
+    __exist_shape_view "$this" && {
         local shape; __get_shape_view_field "$this" shape
         free_shape "$shape"
+
         local canvas; __get_shape_view_field "$this" canvas
         free_canvas "$canvas"
+
         __free_shape_view "$this"
-    fi
+    }
 }
 
 get_shape_view_col() {
