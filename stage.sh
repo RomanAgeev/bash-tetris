@@ -2,6 +2,7 @@
 
 source ./utils/_main.sh
 source ./canvas.sh
+source ./shape_view.sh
 
 new_class stage
 
@@ -34,16 +35,6 @@ new_stage() {
     set_stage_field "$this" height "$height"
 }
 
-get_stage_bottom() {
-    local this="${1:?}"
-    local result="${2:?}"
-
-    local row; get_stage_field "$this" row
-    local height; get_stage_field "$this" height
-
-    eval "$result=\$(( \$row + \$height ))"
-}
-
 get_stage_start_position() {
     local this="${1:?}"
     local result_row="${2:?}"
@@ -57,6 +48,36 @@ get_stage_start_position() {
 
     eval "$result_row=\$row"
     eval "$result_col=\$start_col"
+}
+
+is_shape_parked_in_stage() {
+    local this="${1:?}"
+    local shape_view="${2:?}"
+    local result="${3:?}"
+
+    local view_row; get_shape_view_row "$shape_view" view_row
+    local view_height; get_shape_view_height "$shape_view" view_height
+    local view_bottom=$(( $view_row + $view_height ))
+
+    local row; get_stage_field "$this" row
+    local height; get_stage_field "$this" height
+    local bottom=$(( $row + $height ))
+
+    [ $view_bottom -lt $bottom ] && eval "$result=$NO" || eval "$result=$YES"
+}
+
+get_shape_park_row_in_stage() {
+    local this="${1:?}"
+    local shape_view="${2:?}"
+    local result="${3:?}"
+
+    local view_height; get_shape_view_height "$shape_view" view_height
+
+    local row; get_stage_field "$this" row
+    local height; get_stage_field "$this" height
+    local bottom=$(( $row + $height ))
+
+    eval "$result=\$((\$bottom - \$view_height))"
 }
 
 render_stage() {

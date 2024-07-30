@@ -55,13 +55,15 @@ get_shape_view_row() {
     eval "$result=\$row"
 }
 
-get_shape_view_rotation() {
+get_shape_view_height() {
     local this="${1:?}"
     local result="${2:?}"
 
+    local shape; get_shape_view_field "$this" shape
     local rotation; get_shape_view_field "$this" rotation
+    local actual_height; get_shape_actual_height "$shape" "$rotation" actual_height
 
-    eval "$result=\$rotation"
+    eval "$result=\$actual_height"
 }
 
 _render_shape_view() {
