@@ -3,6 +3,8 @@
 source ./utils/_main.sh
 source ./canvas.sh
 
+colors=("$RED" "$GREEN" "$YELLOW" "$BLUE" "$MAGENTA" "$CYAN" "$WHITE")
+
 new_class shape
 
 get_shape_length() {

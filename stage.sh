@@ -35,19 +35,23 @@ new_stage() {
     set_stage_field "$this" height "$height"
 }
 
-get_stage_start_position() {
+start_stage_shape() {
     local this="${1:?}"
-    local result_row="${2:?}"
-    local result_col="${3:?}"
+    local shape="${2:?}"
+    local shape_view="${3:?}"
+
+    new_shape_view "$shape_view" "$shape"
+
+    local color_index=$(( $RANDOM % ${#colors[@]} ))
+    set_shape_view_color "$shape_view" "${colors[$color_index]}"
 
     local row; get_stage_field "$this" row
     local col; get_stage_field "$this" col
     local width; get_stage_field "$this" width
-
     local start_col=$(( $col + $width / 2 - 1 ))
 
-    eval "$result_row=\$row"
-    eval "$result_col=\$start_col"
+    enabled_shape_view_render "$shape_view"
+    move_shape_view_at "$shape_view" $row $start_col
 }
 
 is_shape_parked_in_stage() {
