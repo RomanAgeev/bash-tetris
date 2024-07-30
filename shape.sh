@@ -9,7 +9,7 @@ get_shape_length() {
     local this="${1:?}"
     local result="${2:-shape_length}"
 
-    local length; get_shape_field "$this" length
+    local length; __get_shape_field "$this" length
     eval "$result=\"\$length\""
 }
 
@@ -18,8 +18,8 @@ get_shape_actual_width() {
     local rotation=$(( ${2:?} % 4 ))
     local result="${3:?}"
 
-    local width; get_shape_field "$this" width
-    local height; get_shape_field "$this" height
+    local width; __get_shape_field "$this" width
+    local height; __get_shape_field "$this" height
 
     local _actual_width;
     [ $(( $rotation % 2 )) -eq 0 ] && _actual_width="$width" || _actual_width="$height"
@@ -32,8 +32,8 @@ get_shape_actual_height() {
     local rotation=$(( ${2:?} % 4 ))
     local result="${3:?}"
 
-    local width; get_shape_field "$this" width
-    local height; get_shape_field "$this" height
+    local width; __get_shape_field "$this" width
+    local height; __get_shape_field "$this" height
 
     local _actual_height;
     [ $(( $rotation % 2 )) -eq 0 ] && _actual_height="$height" || _actual_height="$width"
@@ -140,26 +140,26 @@ new_shape() {
 
     # 0-rotation format
     local shape_format_0; _get_shape_format shape_format_0 "${lines[@]}"
-    set_shape_array_field "$this" format_0 "${shape_format_0[@]}"
+    __set_shape_array_field "$this" format_0 "${shape_format_0[@]}"
 
     # 90-rotation format
     local shape_lines_1; _get_shape_lines_1 shape_lines_1 "$width" "$height" "${lines[@]}"
     local shape_format_1; _get_shape_format shape_format_1 "${shape_lines_1[@]}"
-    set_shape_array_field "$this" format_1 "${shape_format_1[@]}"
+    __set_shape_array_field "$this" format_1 "${shape_format_1[@]}"
 
     # 180-rotation format
     local shape_lines_2; _get_shape_lines_2 shape_lines_2 "$width" "$height" "${lines[@]}"
     local shape_format_2; _get_shape_format shape_format_2 "${shape_lines_2[@]}"
-    set_shape_array_field "$this" format_2 "${shape_format_2[@]}"
+    __set_shape_array_field "$this" format_2 "${shape_format_2[@]}"
 
     # 270-rotation format
     local shape_lines_3; _get_shape_lines_3 shape_lines_3 "$width" "$height" "${lines[@]}"
     local shape_format_3; _get_shape_format shape_format_3 "${shape_lines_3[@]}"
-    set_shape_array_field "$this" format_3 "${shape_format_3[@]}"
+    __set_shape_array_field "$this" format_3 "${shape_format_3[@]}"
 
-    set_shape_field "$this" width "$width"
-    set_shape_field "$this" height "$height"
-    set_shape_field "$this" length "$length"
+    __set_shape_field "$this" width "$width"
+    __set_shape_field "$this" height "$height"
+    __set_shape_field "$this" length "$length"
 }
 
 build_shape_canvas() {
@@ -172,10 +172,10 @@ build_shape_canvas() {
 
     local format_field="format_${rotation}"
 
-    eval "local $format_field; get_shape_array_field \$this $format_field"
+    eval "local $format_field; __get_shape_array_field \$this $format_field"
     eval "local format=( \"\${$format_field[@]}\" )"
 
-    local canvas; _shape_field_name "$this" canvas
+    local canvas; __shape_field_name "$this" canvas
 
     new_canvas "$canvas"
     set_canvas_foreground "$canvas" "$color"

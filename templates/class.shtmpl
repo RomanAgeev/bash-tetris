@@ -1,4 +1,4 @@
-_%%{class}_field_name() {
+__%%{class}_field_name() {
     local this="${1:?}"
     local field="${2:?}"
     local result="${3:-$field}"
@@ -6,54 +6,54 @@ _%%{class}_field_name() {
     eval "$result=%%{class}__\${this}__\$field"
 }
 
-set_%%{class}_field() {
+__set_%%{class}_field() {
     local this="${1:?}"
     local field="${2:?}"
     local value="${3:-}"
 
-    local field_name; _%%{class}_field_name "$this" "$field" field_name
+    local field_name; __%%{class}_field_name "$this" "$field" field_name
 
     eval "$field_name=\$value"
 }
 
-set_%%{class}_static_field() {
-    set_%%{class}_field %%{static} "$@"
+__set_%%{class}_static_field() {
+    __set_%%{class}_field %%{static} "$@"
 }
 
-get_%%{class}_field() {
+__get_%%{class}_field() {
     local this="${1:?}"
     local field="${2:?}"
 
-    local field_name; _%%{class}_field_name "$this" "$field" field_name
+    local field_name; __%%{class}_field_name "$this" "$field" field_name
 
     eval "$field=\$$field_name"
 }
 
 get_%%{class}_static_field() {
-    get_%%{class}_field %%{static} "$@"
+    __get_%%{class}_field %%{static} "$@"
 }
 
-set_%%{class}_array_field() {
+__set_%%{class}_array_field() {
     local this="${1:?}"
     local field="${2:?}"
 
     shift 2
 
-    local field_name; _%%{class}_field_name "$this" "$field" field_name
+    local field_name; __%%{class}_field_name "$this" "$field" field_name
 
     eval "$field_name=( \"\$@\" )"
 }
 
-get_%%{class}_array_field() {
+__get_%%{class}_array_field() {
     local this="${1:?}"
     local field="${2:?}"
 
-    local field_name; _%%{class}_field_name "$this" "$field" field_name
+    local field_name; __%%{class}_field_name "$this" "$field" field_name
 
     eval "$field=( \"\${$field_name[@]+\"\${$field_name[@]}\"}\" )"
 }
 
-free_%%{class}() {
+__free_%%{class}() {
     local this="${1:?}"
 
     for var in $(compgen -v "%%{class}__${this}__"); do

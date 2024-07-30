@@ -25,8 +25,8 @@ new_stage stage 10 60 50 30
 render_stage stage
 
 _new_shape() {
-    free_shape shape
-    free_shape_view view
+    __free_shape shape
+    __free_shape_view view
 
     local shape_index=$(( $RANDOM % ${#shapes[@]} ))
     local color_index=$(( $RANDOM % ${#colors[@]} ))

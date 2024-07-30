@@ -7,7 +7,7 @@ new_class canvas
 new_canvas() {
     local this="${1:?}"
 
-    set_canvas_field "$this" body
+    __set_canvas_field "$this" body
 }
 
 _append_canvas_suffix() {
@@ -21,8 +21,8 @@ _append_canvas_suffix() {
         && printf -v suffix "$format" "$@" \
         || suffix="$format"
 
-    local body; get_canvas_field "$this" body
-    set_canvas_field "$this" body "$body$suffix"
+    local body; __get_canvas_field "$this" body
+    __set_canvas_field "$this" body "$body$suffix"
 }
 
 set_canvas_foreground() {
@@ -90,7 +90,7 @@ render_canvas() {
 
     shift 1
 
-    local body; get_canvas_field "$this" body 
+    local body; __get_canvas_field "$this" body 
     printf "$body\n" "$@"
 
     set_foreground "$NEUTRAL"

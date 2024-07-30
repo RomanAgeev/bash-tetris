@@ -7,7 +7,7 @@ source ./shape_view.sh
 new_class stage
 
 set_stage_wall_pleceholder() {
-    set_stage_static_field wall_placeholder "${1:?}"
+    __set_stage_static_field wall_placeholder "${1:?}"
 }
 
 get_stage_wall_pleceholder() {
@@ -15,7 +15,7 @@ get_stage_wall_pleceholder() {
 }
 
 set_stage_floor_pleceholder() {
-    set_stage_static_field floor_placeholder "${1:?}"
+    __set_stage_static_field floor_placeholder "${1:?}"
 }
 
 get_stage_floor_pleceholder() {
@@ -29,10 +29,10 @@ new_stage() {
     local width=${4:?}
     local height=${5:?}
 
-    set_stage_field "$this" row "$row"
-    set_stage_field "$this" col "$col"
-    set_stage_field "$this" width "$width"
-    set_stage_field "$this" height "$height"
+    __set_stage_field "$this" row "$row"
+    __set_stage_field "$this" col "$col"
+    __set_stage_field "$this" width "$width"
+    __set_stage_field "$this" height "$height"
 }
 
 start_stage_shape() {
@@ -42,9 +42,9 @@ start_stage_shape() {
 
     new_shape_view "$shape_view" "$shape"
 
-    local row; get_stage_field "$this" row
-    local col; get_stage_field "$this" col
-    local width; get_stage_field "$this" width
+    local row; __get_stage_field "$this" row
+    local col; __get_stage_field "$this" col
+    local width; __get_stage_field "$this" width
     local start_col=$(( $col + $width / 2 - 1 ))
 
     move_shape_view_at "$shape_view" $row $start_col
@@ -59,8 +59,8 @@ is_shape_parked_in_stage() {
     local view_height; get_shape_view_height "$shape_view" view_height
     local view_bottom=$(( $view_row + $view_height ))
 
-    local row; get_stage_field "$this" row
-    local height; get_stage_field "$this" height
+    local row; __get_stage_field "$this" row
+    local height; __get_stage_field "$this" height
     local bottom=$(( $row + $height ))
 
     [ $view_bottom -lt $bottom ] && eval "$result=$NO" || eval "$result=$YES"
@@ -73,8 +73,8 @@ get_shape_park_row_in_stage() {
 
     local view_height; get_shape_view_height "$shape_view" view_height
 
-    local row; get_stage_field "$this" row
-    local height; get_stage_field "$this" height
+    local row; __get_stage_field "$this" row
+    local height; __get_stage_field "$this" height
     local bottom=$(( $row + $height ))
 
     eval "$result=\$((\$bottom - \$view_height))"
@@ -83,15 +83,15 @@ get_shape_park_row_in_stage() {
 render_stage() {
     local this="${1:?}"
 
-    local row; get_stage_field "$this" row
-    local col; get_stage_field "$this" col
-    local width; get_stage_field "$this" width
-    local height; get_stage_field "$this" height
+    local row; __get_stage_field "$this" row
+    local col; __get_stage_field "$this" col
+    local width; __get_stage_field "$this" width
+    local height; __get_stage_field "$this" height
 
     local wall_placeholder; get_stage_wall_pleceholder
     local floor_placeholder; get_stage_floor_pleceholder
 
-    local canvas; _stage_field_name "$this" canvas
+    local canvas; __stage_field_name "$this" canvas
 
     local inner_width=$(( $width - 1 ))
 
