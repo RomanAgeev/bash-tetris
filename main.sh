@@ -48,18 +48,15 @@ _loop_handler() {
             move_shape_view_at view $view_park_row $view_col
             _new_shape
             ;;
-        C) move_shape_view_right view ;;
-        D) move_shape_view_left view ;;
+        C) is_shape_parked_right_in_stage stage view || move_shape_view_right view ;;
+        D) is_shape_parked_left_in_stage stage view || move_shape_view_left view ;;
         q) exit ;;
         *) return 1 ;;
     esac
 }
 
 _timeout_handler() {
-    local is_parked; is_shape_parked_in_stage stage view is_parked
-    [ "$is_parked" == "$YES" ] \
-        && _new_shape \
-        || move_shape_view_down view 1
+    is_shape_parked_in_stage stage view && _new_shape || move_shape_view_down view
 }
 
 shutdown() {

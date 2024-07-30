@@ -82,6 +82,17 @@ get_shape_view_height() {
     eval "$result=\$actual_height"
 }
 
+get_shape_view_width() {
+    local this="${1:?}"
+    local result="${2:?}"
+
+    local shape; __get_shape_view_field "$this" shape
+    local rotation; __get_shape_view_field "$this" rotation
+    local actual_width; get_shape_actual_width "$shape" "$rotation" actual_width
+
+    eval "$result=\$actual_width"
+}
+
 _render_shape_view() {
     local this="${1:?}"
 

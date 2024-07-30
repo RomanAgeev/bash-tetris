@@ -61,7 +61,6 @@ start_stage_shape() {
 is_shape_parked_in_stage() {
     local this="${1:?}"
     local shape_view="${2:?}"
-    local result="${3:?}"
 
     local view_row; get_shape_view_row "$shape_view" view_row
     local view_height; get_shape_view_height "$shape_view" view_height
@@ -71,7 +70,32 @@ is_shape_parked_in_stage() {
     local height; __get_stage_field "$this" height
     local bottom=$(( $row + $height ))
 
-    [ $view_bottom -lt $bottom ] && eval "$result=$NO" || eval "$result=$YES"
+     [ $view_bottom -eq $bottom ]
+}
+
+is_shape_parked_left_in_stage() {
+    local this="${1:?}"
+    local shape_view="${2:?}"
+
+    local view_col; get_shape_view_col "$shape_view" view_col
+    local col; __get_stage_field "$this" col
+
+    [ $view_col -eq $(( $col + 1 )) ]
+}
+
+is_shape_parked_right_in_stage() {
+    local this="${1:?}"
+    local shape_view="${2:?}"
+
+    local view_col; get_shape_view_col "$shape_view" view_col
+    local view_width; get_shape_view_width "$shape_view" view_width
+    local view_right=$(( $view_col + $view_width ))
+
+    local col; __get_stage_field "$this" col
+    local width; __get_stage_field "$this" width
+    local right=$(( $col + $width ))
+
+    [ $view_right -eq $right ]
 }
 
 get_shape_park_row_in_stage() {
