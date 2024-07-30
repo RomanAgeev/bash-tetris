@@ -29,10 +29,20 @@ new_stage() {
     local width=${4:?}
     local height=${5:?}
 
+    __init_stage "$this"
+
     __set_stage_field "$this" row "$row"
     __set_stage_field "$this" col "$col"
     __set_stage_field "$this" width "$width"
     __set_stage_field "$this" height "$height"
+}
+
+free_stage() {
+    local this="${1:?}"
+
+    if __exist_stage "$this"; then
+        __free_stage "$this"
+    fi
 }
 
 start_stage_shape() {

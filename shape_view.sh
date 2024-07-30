@@ -20,6 +20,8 @@ new_shape_view() {
     local default_placeholder; get_shape_view_default_placeholder
     local placeholder="${3:-$default_placeholder}"
 
+    __init_shape_view "$this"
+
     __set_shape_view_field "$this" shape "$shape"
     __set_shape_view_field "$this" canvas
     __set_shape_view_field "$this" row 0
@@ -35,6 +37,18 @@ new_shape_view() {
     __set_shape_view_array_field "$this" placeholders "${placeholders[@]}"
     local spaces; fill_array spaces "$shape_length"
     __set_shape_view_array_field "$this" spaces "${spaces[@]}"
+}
+
+free_shape_view() {
+    local this="${1:?}"
+
+    if __exist_shape_view "$this"; then
+        local shape; __get_shape_view_field "$this" shape
+        free_shape "$shape"
+        local canvas; __get_shape_view_field "$this" canvas
+        free_canvas "$canvas"
+        __free_shape_view "$this"
+    fi
 }
 
 get_shape_view_col() {

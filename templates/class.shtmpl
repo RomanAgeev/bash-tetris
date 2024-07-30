@@ -53,10 +53,31 @@ __get_%%{class}_array_field() {
     eval "$field=( \"\${$field_name[@]+\"\${$field_name[@]}\"}\" )"
 }
 
+__list_%%{class}_fields() {
+    local this="${1:?}"
+
+    printf "%s\n" $(compgen -v "%%{class}__${this}__")
+}
+
 __free_%%{class}() {
     local this="${1:?}"
 
     for var in $(compgen -v "%%{class}__${this}__"); do
         unset "$var"
     done
+}
+
+__exist_%%{class}() {
+    local this="${1:?}"
+
+    local ref_field; __%%{class}_field_name "$this" REF ref_field
+    eval "local ref=\${$ref_field+.}"
+
+    [ ! -z "$ref" ]
+}
+
+__init_%%{class}() {
+    local this="${1:?}"
+
+    __set_%%{class}_field "$this" REF "."
 }

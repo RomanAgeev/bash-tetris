@@ -7,7 +7,17 @@ new_class canvas
 new_canvas() {
     local this="${1:?}"
 
+    __init_canvas "$this"
+
     __set_canvas_field "$this" body
+}
+
+free_canvas() {
+    local this="${1:?}"
+
+    if __exist_canvas "$this"; then
+        __free_canvas "$this"
+    fi
 }
 
 _append_canvas_suffix() {

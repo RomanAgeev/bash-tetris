@@ -25,8 +25,7 @@ new_stage stage 10 60 50 30
 render_stage stage
 
 _new_shape() {
-    __free_shape shape
-    __free_shape_view view
+    free_shape_view view
 
     local shape_index=$(( $RANDOM % ${#shapes[@]} ))
     local color_index=$(( $RANDOM % ${#colors[@]} ))
@@ -63,7 +62,15 @@ _timeout_handler() {
         || move_shape_view_down view 1
 }
 
-trap "clear; show_cursor; echo" EXIT
+shutdown() {
+    free_shape_view view
+    free_stage stage
+    clear
+    show_cursor
+    echo
+}
+
+trap "shutdown" EXIT
 
 _new_shape
 

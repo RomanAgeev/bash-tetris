@@ -123,6 +123,8 @@ new_shape() {
     local this="${1:?}"
     local string="${2:?}"
 
+    __init_shape "$this"
+
     local lines;
     IFS=' ' read -r -a lines <<< "$string"
 
@@ -160,6 +162,14 @@ new_shape() {
     __set_shape_field "$this" width "$width"
     __set_shape_field "$this" height "$height"
     __set_shape_field "$this" length "$length"
+}
+
+free_shape() {
+    local this="${1:?}"
+
+    if __exist_shape "$this"; then
+        __free_shape "$this"
+    fi
 }
 
 build_shape_canvas() {
