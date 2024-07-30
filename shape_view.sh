@@ -99,6 +99,7 @@ _render_shape_view() {
 
     if [ -n "$canvas" ]; then
         render_canvas "$canvas" "${spaces[@]}"
+        free_canvas "$canvas"
     fi
 
     local shape_canvas; build_shape_canvas "$shape" "$row" "$col" "$rotation" "$color"
