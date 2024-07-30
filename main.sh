@@ -41,7 +41,16 @@ _loop_handler() {
     local key="${1:?}"
 
     case $key in
-        A) rotate_shape_view_left view ;;
+        A)
+            disable_shape_view_render view
+            rotate_shape_view_left view
+            is_shape_parked_right_in_stage stage view && {
+                local view_row; get_shape_view_row view view_row
+                local view_park_col; get_shape_park_right_col_in_stage stage view view_park_col
+                move_shape_view_at view $view_row $view_park_col
+            }
+            enabled_shape_view_render view
+            ;;
         B)
             local view_park_row; get_shape_park_row_in_stage stage view view_park_row
             local view_col; get_shape_view_col view view_col
