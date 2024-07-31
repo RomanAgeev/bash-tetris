@@ -27,7 +27,7 @@ shape_view__new() {
     __set_shape_view_field "$this" rotation 0
     __set_shape_view_field "$this" color "$WHITE"
 
-    __set_shape_view_field "$this" render_enabled "$NO"
+    __set_shape_view_field "$this" render_enabled 1
 
     local shape_length; shape__get_length "$shape"
 
@@ -95,9 +95,8 @@ shape_view__get_width() {
 shape_view__enable_auto_render() {
     local this="${1:?}"
 
-    local render_enabled; __get_shape_view_field "$this" render_enabled
-    [ "$render_enabled" == "$NO" ] && {
-        __set_shape_view_field "$this" render_enabled "$YES"
+    _shape_view__is_render_enabled || {
+        __set_shape_view_field "$this" render_enabled 0
         _shape_view__render "$this"
     }
 }
@@ -105,8 +104,7 @@ shape_view__enable_auto_render() {
 shape_view__disable_auto_render() {
     local this="${1:?}"
 
-    local render_enabled; __get_shape_view_field "$this" render_enabled
-    [ "$render_enabled" == "$YES" ] && __set_shape_view_field "$this" render_enabled "$NO"
+    __set_shape_view_field "$this" render_enabled 1
 }
 
 shape_view__move_at() {
@@ -168,11 +166,16 @@ shape_view__set_color() {
     _shape_view__render "$this"
 }
 
+_shape_view__is_render_enabled() {
+    local render_enabled; __get_shape_view_field "$this" render_enabled
+    return $render_enabled
+}
+
 _shape_view__render() {
     local this="${1:?}"
 
     local render_enabled; __get_shape_view_field "$this" render_enabled
-    [ "$render_enabled" == "$YES" ] || return 0
+    _shape_view__is_render_enabled || return 0
 
     local canvas; __get_shape_view_field "$this" canvas
     local shape; __get_shape_view_field "$this" shape
