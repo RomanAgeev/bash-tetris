@@ -32,27 +32,32 @@ next_shape() {
 }
 
 on_action() {
-    local key="${1:?}"
-
-    case $key in
+    case $1 in
         A)
             shape_view__disable_auto_render view
             shape_view__rotate_right view
+            local view_row; shape_view__get_row view view_row
+            local view_col; shape_view__get_col view view_col
             is_shape_right view && {
-                local view_row; shape_view__get_row view view_row
                 local most_right_col; get_shape_most_right_col view most_right_col
-                shape_view__move_at view $view_row $most_right_col
+                view_col=$most_right_col
             }
+            is_shape_down view && {
+                local most_bottom_row; get_shape_most_bottom_row view most_bottom_row
+                view_row=$most_bottom_row
+            }
+            shape_view__move_at view $view_row $view_col
             shape_view__enable_auto_render view
             ;;
-        B)
+        B) is_shape_down view || shape_view__move_down view ;;
+        C) is_shape_right view || shape_view__move_right view ;;
+        D) is_shape_left view || shape_view__move_left view ;;
+        '')
             local most_bottom_row; get_shape_most_bottom_row view most_bottom_row
             local view_col; shape_view__get_col view view_col
             shape_view__move_at view $most_bottom_row $view_col
             next_shape
             ;;
-        C) is_shape_right view || shape_view__move_right view ;;
-        D) is_shape_left view || shape_view__move_left view ;;
         q) exit ;;
         *) return 1 ;;
     esac
