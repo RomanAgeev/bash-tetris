@@ -70,7 +70,7 @@ __free_%%{class}() {
 __exist_%%{class}() {
     local this="${1:?}"
 
-    local ref_field; __%%{class}_field_name "$this" REF ref_field
+    local ref_field; __%%{class}_field_name "$this" _ ref_field
     eval "local ref=\${$ref_field+.}"
 
     [ ! -z "$ref" ]
@@ -79,5 +79,5 @@ __exist_%%{class}() {
 __init_%%{class}() {
     local this="${1:?}"
 
-    __set_%%{class}_field "$this" REF "."
+    __set_%%{class}_field "$this" _ "."
 }
