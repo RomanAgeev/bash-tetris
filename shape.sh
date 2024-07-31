@@ -107,11 +107,11 @@ shape__get_canvas() {
 
     local canvas; __shape_field_name "$this" canvas
 
-    new_canvas "$canvas"
-    set_canvas_foreground "$canvas" "$color"
-    canvas_cursor_at "$canvas" "$row" "$col"
+    canvas__new "$canvas"
+    canvas__set_foreground "$canvas" "$color"
+    canvas__cursor_at "$canvas" "$row" "$col"
     for line in "${format[@]}"; do
-        add_canvas_format_line "$canvas" "$line"
+        canvas__add_format_line "$canvas" "$line"
     done
 
     eval "$result=\"\$canvas\""

@@ -46,7 +46,7 @@ shape_view__free() {
         shape__free "$shape"
 
         local canvas; __get_shape_view_field "$this" canvas
-        free_canvas "$canvas"
+        canvas__free "$canvas"
 
         __free_shape_view "$this"
     }
@@ -184,12 +184,12 @@ _shape_view__render() {
     local spaces; __get_shape_view_array_field "$this" spaces
 
     if [ -n "$canvas" ]; then
-        render_canvas "$canvas" "${spaces[@]}"
-        free_canvas "$canvas"
+        canvas__render "$canvas" "${spaces[@]}"
+        canvas__free "$canvas"
     fi
 
     local shape_canvas; shape__get_canvas "$shape" "$row" "$col" "$rotation" "$color"
-    render_canvas "$shape_canvas" "${placeholders[@]}"
+    canvas__render "$shape_canvas" "${placeholders[@]}"
 
     __set_shape_view_field "$this" canvas "$shape_canvas"
 }
