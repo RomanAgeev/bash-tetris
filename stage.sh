@@ -4,160 +4,91 @@ source ./utils/_main.sh
 source ./canvas.sh
 source ./shape_view.sh
 
-new_class stage
+WALL="|"
+FLOOR="_"
 
-set_stage_wall_pleceholder() {
-    __set_stage_static_field wall_placeholder "${1:?}"
+init_stage() {
+    ROW="${1:?}"
+    COL="${2:?}"
+    WIDTH="${3:?}"
+    HEIGHT="${4:?}"
+    BOTTOM=$(( $ROW + $HEIGHT ))
+    RIGHT=$(( $COL + $WIDTH ))
+    WIDTH_INNER=$(( $WIDTH - 1 ))
 }
 
-get_stage_wall_pleceholder() {
-    get_stage_static_field wall_placeholder
+drop_shape() {
+    local shape="${1:?}"
+    local view="${2:?}"
+
+    new_shape_view "$view" "$shape"
+
+    local start_col=$(( $COL + $WIDTH / 2 - 1 ))
+
+    move_shape_view_at "$view" "$ROW" "$start_col"
 }
 
-set_stage_floor_pleceholder() {
-    __set_stage_static_field floor_placeholder "${1:?}"
-}
+is_shape_down() {
+    local view="${1:?}"
 
-get_stage_floor_pleceholder() {
-    get_stage_static_field floor_placeholder
-}
-
-new_stage() {
-    local this="${1:?}"
-    local row=${2:?}
-    local col=${3:?}
-    local width=${4:?}
-    local height=${5:?}
-
-    __init_stage "$this"
-
-    __set_stage_field "$this" row "$row"
-    __set_stage_field "$this" col "$col"
-    __set_stage_field "$this" width "$width"
-    __set_stage_field "$this" height "$height"
-}
-
-free_stage() {
-    local this="${1:?}"
-
-    __exist_stage "$this" && __free_stage "$this"
-}
-
-start_stage_shape() {
-    local this="${1:?}"
-    local shape="${2:?}"
-    local shape_view="${3:?}"
-
-    new_shape_view "$shape_view" "$shape"
-
-    local row; __get_stage_field "$this" row
-    local col; __get_stage_field "$this" col
-    local width; __get_stage_field "$this" width
-    local start_col=$(( $col + $width / 2 - 1 ))
-
-    move_shape_view_at "$shape_view" $row $start_col
-}
-
-is_shape_parked_in_stage() {
-    local this="${1:?}"
-    local shape_view="${2:?}"
-
-    local view_row; get_shape_view_row "$shape_view" view_row
-    local view_height; get_shape_view_height "$shape_view" view_height
+    local view_row; get_shape_view_row "$view" view_row
+    local view_height; get_shape_view_height "$view" view_height
     local view_bottom=$(( $view_row + $view_height ))
 
-    local row; __get_stage_field "$this" row
-    local height; __get_stage_field "$this" height
-    local bottom=$(( $row + $height ))
-
-     [ $view_bottom -ge $bottom ]
+    [ $view_bottom -ge $BOTTOM ]
 }
 
-is_shape_parked_left_in_stage() {
-    local this="${1:?}"
-    local shape_view="${2:?}"
+is_shape_left() {
+    local view="${1:?}"
 
-    local view_col; get_shape_view_col "$shape_view" view_col
-    local col; __get_stage_field "$this" col
+    local view_col; get_shape_view_col "$view" view_col
 
-    [ $view_col -le $(( $col + 1 )) ]
+    [ $view_col -le $(( $COL + 1 )) ]
 }
 
-is_shape_parked_right_in_stage() {
-    local this="${1:?}"
-    local shape_view="${2:?}"
+is_shape_right() {
+    local view="${1:?}"
 
-    local view_col; get_shape_view_col "$shape_view" view_col
-    local view_width; get_shape_view_width "$shape_view" view_width
+    local view_col; get_shape_view_col "$view" view_col
+    local view_width; get_shape_view_width "$view" view_width
     local view_right=$(( $view_col + $view_width ))
 
-    local col; __get_stage_field "$this" col
-    local width; __get_stage_field "$this" width
-    local right=$(( $col + $width ))
-
-    [ $view_right -ge $right ]
+    [ $view_right -ge $RIGHT ]
 }
 
-get_shape_park_right_col_in_stage() {
-    local this="${1:?}"
-    local shape_view="${2:?}"
-    local result="${3:?}"
+get_shape_most_right_col() {
+    local view="${1:?}"
+    local result="${2:?}"
 
-    local view_width; get_shape_view_width "$shape_view" view_width
+    local view_width; get_shape_view_width "$view" view_width
 
-    local col; __get_stage_field "$this" col
-    local width; __get_stage_field "$this" width
-    local right=$(( $col + $width ))
-
-    eval "$result=\$((\$right - \$view_width))"
+    eval "$result=\$((\$RIGHT - \$view_width))"
 }
 
-get_shape_park_row_in_stage() {
-    local this="${1:?}"
-    local shape_view="${2:?}"
-    local result="${3:?}"
+get_shape_most_bottom_row() {
+    local view="${1:?}"
+    local result="${2:?}"
 
-    local view_height; get_shape_view_height "$shape_view" view_height
+    local view_height; get_shape_view_height "$view" view_height
 
-    local row; __get_stage_field "$this" row
-    local height; __get_stage_field "$this" height
-    local bottom=$(( $row + $height ))
-
-    eval "$result=\$((\$bottom - \$view_height))"
+    eval "$result=\$((\$BOTTOM - \$view_height))"
 }
 
 render_stage() {
-    local this="${1:?}"
-
-    local row; __get_stage_field "$this" row
-    local col; __get_stage_field "$this" col
-    local width; __get_stage_field "$this" width
-    local height; __get_stage_field "$this" height
-
-    local wall_placeholder; get_stage_wall_pleceholder
-    local floor_placeholder; get_stage_floor_pleceholder
-
-    local canvas; __stage_field_name "$this" canvas
-
-    local inner_width=$(( $width - 1 ))
-
     local line;
-    printf -v line "$wall_placeholder%$inner_width.${inner_width}s$wall_placeholder" " "
+    printf -v line "$WALL%$WIDTH_INNER.${WIDTH_INNER}s$WALL" " "
 
-    new_canvas "$canvas"
-    set_canvas_foreground "$canvas" "$WHITE"
-    canvas_cursor_at "$canvas" "$row" "$col"
-    for (( i=0; i<$height-1; i++ )); do
-        add_canvas_format_line "$canvas" "$line"
+    new_canvas stage_canvas
+    set_canvas_foreground stage_canvas $WHITE
+    canvas_cursor_at stage_canvas $ROW $COL
+    for (( i = 0; i<$HEIGHT - 1; i++ )); do
+        add_canvas_format_line stage_canvas "$line"
     done
 
     local bottom_line;
-    printf -v bottom_line "$wall_placeholder%$inner_width.${inner_width}s$wall_placeholder" " "
-    bottom_line="${bottom_line// /$floor_placeholder}"
-    add_canvas_format_line "$canvas" "$bottom_line"
+    printf -v bottom_line "$WALL%$WIDTH_INNER.${WIDTH_INNER}s$WALL" " "
+    bottom_line="${bottom_line// /$FLOOR}"
+    add_canvas_format_line stage_canvas "$bottom_line"
 
-    render_canvas "$canvas"
+    render_canvas stage_canvas
 }
-
-set_stage_wall_pleceholder "|"
-set_stage_floor_pleceholder "_"
