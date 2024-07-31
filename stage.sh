@@ -21,18 +21,18 @@ drop_shape() {
     local shape="${1:?}"
     local view="${2:?}"
 
-    new_shape_view "$view" "$shape"
+    shape_view__new "$view" "$shape"
 
     local start_col=$(( $COL + $WIDTH / 2 - 1 ))
 
-    move_shape_view_at "$view" "$ROW" "$start_col"
+    shape_view__move_at "$view" "$ROW" "$start_col"
 }
 
 is_shape_down() {
     local view="${1:?}"
 
-    local view_row; get_shape_view_row "$view" view_row
-    local view_height; get_shape_view_height "$view" view_height
+    local view_row; shape_view__get_row "$view" view_row
+    local view_height; shape_view__get_height "$view" view_height
     local view_bottom=$(( $view_row + $view_height ))
 
     [ $view_bottom -ge $BOTTOM ]
@@ -41,7 +41,7 @@ is_shape_down() {
 is_shape_left() {
     local view="${1:?}"
 
-    local view_col; get_shape_view_col "$view" view_col
+    local view_col; shape_view__get_col "$view" view_col
 
     [ $view_col -le $(( $COL + 1 )) ]
 }
@@ -49,8 +49,8 @@ is_shape_left() {
 is_shape_right() {
     local view="${1:?}"
 
-    local view_col; get_shape_view_col "$view" view_col
-    local view_width; get_shape_view_width "$view" view_width
+    local view_col; shape_view__get_col "$view" view_col
+    local view_width; shape_view__get_width "$view" view_width
     local view_right=$(( $view_col + $view_width ))
 
     [ $view_right -ge $RIGHT ]
@@ -60,7 +60,7 @@ get_shape_most_right_col() {
     local view="${1:?}"
     local result="${2:?}"
 
-    local view_width; get_shape_view_width "$view" view_width
+    local view_width; shape_view__get_width "$view" view_width
 
     eval "$result=\$((\$RIGHT - \$view_width))"
 }
@@ -69,7 +69,7 @@ get_shape_most_bottom_row() {
     local view="${1:?}"
     local result="${2:?}"
 
-    local view_height; get_shape_view_height "$view" view_height
+    local view_height; shape_view__get_height "$view" view_height
 
     eval "$result=\$((\$BOTTOM - \$view_height))"
 }

@@ -6,19 +6,17 @@ source ./shape.sh
 
 new_class shape_view
 
-set_shape_view_default_placeholder() {
-    __set_shape_view_static_field default_placeholder "${1:?}"
+shape_view__set_placeholder() {
+    __set_shape_view_static_field placeholder "${1:?}"
 }
 
-get_shape_view_default_placeholder() {
-    get_shape_view_static_field default_placeholder
+shape_view__get_placeholder() {
+    get_shape_view_static_field placeholder
 }
 
-new_shape_view() {
+shape_view__new() {
     local this="${1:?}"
     local shape="${2:?}"
-    local default_placeholder; get_shape_view_default_placeholder
-    local placeholder="${3:-$default_placeholder}"
 
     __init_shape_view "$this"
 
@@ -33,13 +31,14 @@ new_shape_view() {
 
     local shape_length; get_shape_length "$shape"
 
+    local placeholder; shape_view__get_placeholder
     local placeholders; fill_array placeholders "$shape_length" "$placeholder"
     __set_shape_view_array_field "$this" placeholders "${placeholders[@]}"
     local spaces; fill_array spaces "$shape_length"
     __set_shape_view_array_field "$this" spaces "${spaces[@]}"
 }
 
-free_shape_view() {
+shape_view__free() {
     local this="${1:?}"
 
     __exist_shape_view "$this" && {
@@ -53,7 +52,7 @@ free_shape_view() {
     }
 }
 
-get_shape_view_col() {
+shape_view__get_col() {
     local this="${1:?}"
     local result="${2:?}"
 
@@ -62,16 +61,16 @@ get_shape_view_col() {
     eval "$result=\$col"
 }
 
-get_shape_view_row() {
+shape_view__get_row() {
     local this="${1:?}"
     local result="${2:?}"
 
-    local col; __get_shape_view_field "$this" row
+    local row; __get_shape_view_field "$this" row
 
     eval "$result=\$row"
 }
 
-get_shape_view_height() {
+shape_view__get_height() {
     local this="${1:?}"
     local result="${2:?}"
 
@@ -82,7 +81,7 @@ get_shape_view_height() {
     eval "$result=\$actual_height"
 }
 
-get_shape_view_width() {
+shape_view__get_width() {
     local this="${1:?}"
     local result="${2:?}"
 
@@ -93,7 +92,83 @@ get_shape_view_width() {
     eval "$result=\$actual_width"
 }
 
-_render_shape_view() {
+shape_view__enable_auto_render() {
+    local this="${1:?}"
+
+    local render_enabled; __get_shape_view_field "$this" render_enabled
+    [ "$render_enabled" == "$NO" ] && {
+        __set_shape_view_field "$this" render_enabled "$YES"
+        _shape_view__render "$this"
+    }
+}
+
+shape_view__disable_auto_render() {
+    local this="${1:?}"
+
+    local render_enabled; __get_shape_view_field "$this" render_enabled
+    [ "$render_enabled" == "$YES" ] && __set_shape_view_field "$this" render_enabled "$NO"
+}
+
+shape_view__move_at() {
+    local this="${1:?}"
+    local row="${2:?}"
+    local col="${3:?}"
+
+    __set_shape_view_field "$this" row "$row"
+    __set_shape_view_field "$this" col "$col"
+
+    _shape_view__render "$this"
+}
+
+shape_view__move_left() {
+    local this="${1:?}"
+    local step="${2:-1}"
+
+    local col; __get_shape_view_field "$this" col
+    __set_shape_view_field "$this" col $(( $col - $step ))
+
+    _shape_view__render "$this"
+}
+
+shape_view__move_right() {
+    local this="${1:?}"
+    local step="${2:-1}"
+
+    local col; __get_shape_view_field "$this" col
+    __set_shape_view_field "$this" col $(( $col + $step ))
+
+    _shape_view__render "$this"
+}
+
+shape_view__move_down() {
+    local this="${1:?}"
+    local step="${2:-1}"
+
+    local row; __get_shape_view_field "$this" row
+    __set_shape_view_field "$this" row $(( $row + $step ))
+
+    _shape_view__render "$this"
+}
+
+shape_view__rotate_right() {
+    local this="${1:?}"
+
+    local rotation; __get_shape_view_field "$this" rotation
+    __set_shape_view_field "$this" rotation $(( ($rotation + 1) % 4 ))
+
+    _shape_view__render "$this"
+}
+
+shape_view__set_color() {
+    local this="${1:?}"
+    local color="${2:?}"
+
+    __set_shape_view_field "$this" color "$color"
+
+    _shape_view__render "$this"
+}
+
+_shape_view__render() {
     local this="${1:?}"
 
     local render_enabled; __get_shape_view_field "$this" render_enabled
@@ -119,101 +194,4 @@ _render_shape_view() {
     __set_shape_view_field "$this" canvas "$shape_canvas"
 }
 
-enabled_shape_view_render() {
-    local this="${1:?}"
-
-    local render_enabled; __get_shape_view_field "$this" render_enabled
-    [ "$render_enabled" == "$NO" ] && {
-        __set_shape_view_field "$this" render_enabled "$YES"
-        _render_shape_view "$this"
-    }
-}
-
-disable_shape_view_render() {
-    local this="${1:?}"
-
-    local render_enabled; __get_shape_view_field "$this" render_enabled
-    [ "$render_enabled" == "$YES" ] && __set_shape_view_field "$this" render_enabled "$NO"
-}
-
-move_shape_view_at() {
-    local this="${1:?}"
-    local row="${2:?}"
-    local col="${3:?}"
-
-    __set_shape_view_field "$this" row "$row"
-    __set_shape_view_field "$this" col "$col"
-
-    _render_shape_view "$this"
-}
-
-move_shape_view_left() {
-    local this="${1:?}"
-    local step="${2:-1}"
-
-    local col; __get_shape_view_field "$this" col
-    __set_shape_view_field "$this" col $(( $col - $step ))
-
-    _render_shape_view "$this"
-}
-
-move_shape_view_right() {
-    local this="${1:?}"
-    local step="${2:-1}"
-
-    local col; __get_shape_view_field "$this" col
-    __set_shape_view_field "$this" col $(( $col + $step ))
-
-    _render_shape_view "$this"
-}
-
-move_shape_view_up() {
-    local this="${1:?}"
-    local step="${2:-1}"
-
-    local row; __get_shape_view_field "$this" row
-    __set_shape_view_field "$this" row $(( $row - $step ))
-
-    _render_shape_view "$this"
-}
-
-move_shape_view_down() {
-    local this="${1:?}"
-    local step="${2:-1}"
-
-    local row; __get_shape_view_field "$this" row
-    __set_shape_view_field "$this" row $(( $row + $step ))
-
-    _render_shape_view "$this"
-}
-
-rotate_shape_view_right() {
-    local this="${1:?}"
-
-    local rotation; __get_shape_view_field "$this" rotation
-    __set_shape_view_field "$this" rotation $(( ($rotation + 1) % 4 ))
-
-    _render_shape_view "$this"
-}
-
-rotate_shape_view_left() {
-    local this="${1:?}"
-
-    local rotation; __get_shape_view_field "$this" rotation
-    rotation=$(( $rotation - 1 ))
-    [ $rotation -lt 0 ] && rotation=$(( 4 + $rotation ))
-    __set_shape_view_field "$this" rotation $rotation
-
-    _render_shape_view "$this"
-}
-
-set_shape_view_color() {
-    local this="${1:?}"
-    local color="${2:?}"
-
-    __set_shape_view_field "$this" color "$color"
-
-    _render_shape_view "$this"
-}
-
-set_shape_view_default_placeholder X
+shape_view__set_placeholder X
