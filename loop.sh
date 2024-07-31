@@ -3,8 +3,8 @@
 source ./utils/_main.sh
 
 loop() {
-    local loop_handler="${1:?}"
-    local timeout_handler="${2:?}"
+    local on_action="${1:?}"
+    local on_timeout="${2:?}"
     local initial_timeout_ms="${3:-1000}"
 
     local timeout_ms="$initial_timeout_ms"
@@ -15,14 +15,14 @@ loop() {
 
         while :; do
             read -sn 1 -t "$_timeout" key || {
-                "$timeout_handler" 
+                "$on_timeout"
                 timeout_ms="$initial_timeout_ms"
                 get_timestamp_ms before_ms
                 to_seconds "$timeout_ms" _timeout
                 continue
             }
 
-            "$loop_handler" "$key" && break
+            "$on_action" "$key" && break
         done
 
         local after_ms; get_timestamp_ms after_ms
