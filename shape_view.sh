@@ -29,7 +29,7 @@ shape_view__new() {
 
     __set_shape_view_field "$this" render_enabled "$NO"
 
-    local shape_length; get_shape_length "$shape"
+    local shape_length; shape__get_length "$shape"
 
     local placeholder; shape_view__get_placeholder
     local placeholders; fill_array placeholders "$shape_length" "$placeholder"
@@ -43,7 +43,7 @@ shape_view__free() {
 
     __exist_shape_view "$this" && {
         local shape; __get_shape_view_field "$this" shape
-        free_shape "$shape"
+        shape__free "$shape"
 
         local canvas; __get_shape_view_field "$this" canvas
         free_canvas "$canvas"
@@ -76,7 +76,7 @@ shape_view__get_height() {
 
     local shape; __get_shape_view_field "$this" shape
     local rotation; __get_shape_view_field "$this" rotation
-    local actual_height; get_shape_actual_height "$shape" "$rotation" actual_height
+    local actual_height; shape__get_actual_height "$shape" "$rotation" actual_height
 
     eval "$result=\$actual_height"
 }
@@ -87,7 +87,7 @@ shape_view__get_width() {
 
     local shape; __get_shape_view_field "$this" shape
     local rotation; __get_shape_view_field "$this" rotation
-    local actual_width; get_shape_actual_width "$shape" "$rotation" actual_width
+    local actual_width; shape__get_actual_width "$shape" "$rotation" actual_width
 
     eval "$result=\$actual_width"
 }
@@ -188,7 +188,7 @@ _shape_view__render() {
         free_canvas "$canvas"
     fi
 
-    local shape_canvas; build_shape_canvas "$shape" "$row" "$col" "$rotation" "$color"
+    local shape_canvas; shape__get_canvas "$shape" "$row" "$col" "$rotation" "$color"
     render_canvas "$shape_canvas" "${placeholders[@]}"
 
     __set_shape_view_field "$this" canvas "$shape_canvas"
