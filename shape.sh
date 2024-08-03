@@ -22,24 +22,10 @@ init_shape() {
     SHAPE_HEIGHT="${#lines[@]}"
     SHAPE_LENGTH=$(( $SHAPE_WIDTH * $SHAPE_HEIGHT ))
 
-    # 0-rotation format
-    local shape_format_0; _shape__get_format shape_format_0 "${lines[@]}"
-    SHAPE_FORMAT_0=("${shape_format_0[@]}")
-
-    # 90-rotation format
-    local shape_lines_1; _shape__get_lines_1 shape_lines_1 "$SHAPE_WIDTH" "$SHAPE_HEIGHT" "${lines[@]}"
-    local shape_format_1; _shape__get_format shape_format_1 "${shape_lines_1[@]}"
-    SHAPE_FORMAT_1=("${shape_format_1[@]}")
-
-    # 180-rotation format
-    local shape_lines_2; _shape__get_lines_2 shape_lines_2 "$SHAPE_WIDTH" "$SHAPE_HEIGHT" "${lines[@]}"
-    local shape_format_2; _shape__get_format shape_format_2 "${shape_lines_2[@]}"
-    SHAPE_FORMAT_2=("${shape_format_2[@]}")
-
-    # 270-rotation format
-    local shape_lines_3; _shape__get_lines_3 shape_lines_3 "$SHAPE_WIDTH" "$SHAPE_HEIGHT" "${lines[@]}"
-    local shape_format_3; _shape__get_format shape_format_3 "${shape_lines_3[@]}"
-    SHAPE_FORMAT_3=("${shape_format_3[@]}")
+    init_shape_format 0 "${lines[@]}"
+    init_shape_format 1 "${lines[@]}"
+    init_shape_format 2 "${lines[@]}"
+    init_shape_format 3 "${lines[@]}"
 }
 
 shape__get_actual_width() {
@@ -81,80 +67,63 @@ shape__get_canvas() {
     eval "$result=canvas"
 }
 
-_shape__get_format() {
-    local result="${1:?}"
+init_shape_format() {
+    local rotation="${1:?}"
 
     shift 1
 
+    eval "init_shape_lines_$rotation \"\$@\""
+    eval "local lines=( \"\${SHAPE_LINES_$rotation[@]}\" )"
+
     local format=()
-    for line in "$@"; do
+    for line in "${lines[@]}"; do
         local line_format="${line//[^.]/%s}"
         line_format="${line_format//./ %.0s}"
         format+=( "$line_format" )
     done
 
-    eval "$result=( \"\${format[@]}\" )"
+    eval "SHAPE_FORMAT_$rotation=( \"\${format[@]}\" )"
 }
 
-_shape__get_lines_1() {
-    local result="${1:?}"
-    local width="${2:?}"
-    local height="${3:?}"
-
-    shift 3
-
-    local lines=( $@ )
-
-    local shape_lines=()
-    for (( i=0; i<$width; i++ )); do
-        local line=""
-        for (( j=$height-1; j>=0; j-- )); do
-            line=$line"${lines[$j]:$i:1}"
-        done
-        shape_lines+=( "$line" )
-    done
-
-    eval "$result=( \"\${shape_lines[@]}\" )"
+init_shape_lines_0() {
+    SHAPE_LINES_0=( $@ )
 }
 
-_shape__get_lines_2() {
-    local result="${1:?}"
-    local width="${2:?}"
-    local height="${3:?}"
-
-    shift 3
-
+init_shape_lines_1() {
     local lines=( $@ )
 
-    local shape_lines=()
-    for (( j=$height-1; j>=0; j-- )); do
+    SHAPE_LINES_1=()
+    for (( i=0; i<$SHAPE_WIDTH; i++ )); do
         local line=""
-        for (( i=$width-1; i>=0; i-- )); do
+        for (( j=$SHAPE_HEIGHT-1; j>=0; j-- )); do
             line=$line"${lines[$j]:$i:1}"
         done
-        shape_lines+=( "$line" )
+        SHAPE_LINES_1+=( "$line" )
     done
-
-    eval "$result=( \"\${shape_lines[@]}\" )"
 }
 
-_shape__get_lines_3() {
-    local result="${1:?}"
-    local width="${2:?}"
-    local height="${3:?}"
-
-    shift 3
-
+init_shape_lines_2() {
     local lines=( $@ )
 
-    local shape_lines=()
-    for (( i=$width-1; i>=0; i-- )); do
+    SHAPE_LINES_2=()
+    for (( j=$SHAPE_HEIGHT-1; j>=0; j-- )); do
         local line=""
-        for (( j=0; j<$height;j++ )); do
+        for (( i=$SHAPE_WIDTH-1; i>=0; i-- )); do
             line=$line"${lines[$j]:$i:1}"
         done
-        shape_lines+=( "$line" )
+        SHAPE_LINES_2+=( "$line" )
     done
+}
 
-    eval "$result=( \"\${shape_lines[@]}\" )"
+init_shape_lines_3() {
+    local lines=( $@ )
+
+    SHAPE_LINES_3=()
+    for (( i=$SHAPE_WIDTH-1; i>=0; i-- )); do
+        local line=""
+        for (( j=0; j<$SHAPE_HEIGHT;j++ )); do
+            line=$line"${lines[$j]:$i:1}"
+        done
+        SHAPE_LINES_3+=( "$line" )
+    done
 }
