@@ -48,23 +48,17 @@ shape__get_actual_height() {
     eval "$result=\$_actual_height"
 }
 
-shape__get_canvas() {
-    local row="${1:?}"
-    local col="${2:?}"
-    local rotation=$(( ${3:?} % 4 ))
-    local color="${4:?}"
-    local result="${5:-shape_canvas}"
-
-    eval "local format=( \"\${SHAPE_FORMAT_$rotation[@]}\" )"
+init_shape_canvas() {
+    eval "local format=( \"\${SHAPE_FORMAT_$SHAPE_ROTATION[@]}\" )"
 
     canvas__new canvas
-    canvas__set_foreground canvas "$color"
-    canvas__cursor_at canvas "$row" "$col"
+    canvas__set_foreground canvas "$SHAPE_COLOR"
+    canvas__cursor_at canvas "$SHAPE_ROW" "$SHAPE_COL"
     for line in "${format[@]}"; do
         canvas__add_format_line canvas "$line"
     done
 
-    eval "$result=canvas"
+    SHAPE_CANVAS=canvas
 }
 
 init_shape_format() {

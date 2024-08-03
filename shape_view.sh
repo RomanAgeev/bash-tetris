@@ -84,8 +84,6 @@ _shape_view__render() {
         canvas__free "$SHAPE_CANVAS"
     fi
 
-    local shape_canvas; shape__get_canvas "$SHAPE_ROW" "$SHAPE_COL" "$SHAPE_ROTATION" "$SHAPE_COLOR"
-    canvas__render "$shape_canvas" "${SHAPE_PLACEHOLDERS[@]}"
-
-    SHAPE_CANVAS="$shape_canvas"
+    init_shape_canvas
+    canvas__render "$SHAPE_CANVAS" "${SHAPE_PLACEHOLDERS[@]}"
 }
