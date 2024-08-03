@@ -10,6 +10,7 @@ source ./stage.sh
 source ./loop.sh
 
 require bc
+require gdate
 
 SHAPES=("xx xx" "xx. .xx" "x.. xxx" "xxxx" "..x xxx" ".xx xx." ".x. xxx")
 COLORS=("$RED" "$GREEN" "$YELLOW" "$BLUE" "$MAGENTA" "$CYAN" "$WHITE")
