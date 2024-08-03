@@ -14,48 +14,42 @@ require bc
 SHAPES=("xx xx" "xx. .xx" "x.. xxx" "xxxx" "..x xxx" ".xx xx." ".x. xxx")
 COLORS=("$RED" "$GREEN" "$YELLOW" "$BLUE" "$MAGENTA" "$CYAN" "$WHITE")
 
-shape_view__set_placeholder "O"
 set_foreground "$NEUTRAL"
 set_background "$NEUTRAL"
 init_stage 10 60 50 30
 
 next_shape() {
-    shape_view__free view
-
     local shape_index=$(( $RANDOM % ${#SHAPES[@]} ))
     local color_index=$(( $RANDOM % ${#COLORS[@]} ))
 
     shape__new shape "${SHAPES[$shape_index]}"
-    drop_shape shape view
-    shape_view__set_color view "${COLORS[$color_index]}"
-    shape_view__enable_auto_render view
+    drop_shape shape
+    shape_view__set_color "${COLORS[$color_index]}"
+    shape_view__enable_auto_render
 }
 
 on_action() {
     case $1 in
         A)
-            shape_view__disable_auto_render view
-            shape_view__rotate_right view
-            local view_row; shape_view__get_row view view_row
-            local view_col; shape_view__get_col view view_col
-            is_shape_right view && {
-                local most_right_col; get_shape_most_right_col view most_right_col
-                view_col=$most_right_col
+            shape_view__disable_auto_render
+            shape_view__rotate_right
+            is_shape_right && {
+                local most_right_col; get_shape_most_right_col most_right_col
+                SHAPE_COL=$most_right_col
             }
-            is_shape_down view && {
-                local most_bottom_row; get_shape_most_bottom_row view most_bottom_row
-                view_row=$most_bottom_row
+            is_shape_down && {
+                local most_bottom_row; get_shape_most_bottom_row most_bottom_row
+                SHAPE_ROW=$most_bottom_row
             }
-            shape_view__move_at view $view_row $view_col
-            shape_view__enable_auto_render view
+            shape_view__move_at $SHAPE_ROW $SHAPE_COL
+            shape_view__enable_auto_render
             ;;
-        B) is_shape_down view || shape_view__move_down view ;;
-        C) is_shape_right view || shape_view__move_right view ;;
-        D) is_shape_left view || shape_view__move_left view ;;
+        B) is_shape_down || shape_view__move_down ;;
+        C) is_shape_right || shape_view__move_right ;;
+        D) is_shape_left || shape_view__move_left ;;
         '')
-            local most_bottom_row; get_shape_most_bottom_row view most_bottom_row
-            local view_col; shape_view__get_col view view_col
-            shape_view__move_at view $most_bottom_row $view_col
+            local most_bottom_row; get_shape_most_bottom_row most_bottom_row
+            shape_view__move_at $most_bottom_row $SHAPE_COL
             next_shape
             ;;
         q) exit ;;
@@ -64,7 +58,7 @@ on_action() {
 }
 
 on_timeout() {
-    is_shape_down view && next_shape || shape_view__move_down view
+    is_shape_down && next_shape || shape_view__move_down
 }
 
 on_exit() {
