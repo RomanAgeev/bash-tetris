@@ -5,17 +5,12 @@ source ./canvas.sh
 source ./shape.sh
 
 init_shape_view() {
-    SHAPE="${1:?}"
     SHAPE_CANVAS=
     SHAPE_ROW=0
     SHAPE_COL=0
     SHAPE_ROTATION=0
     SHAPE_COLOR="$WHITE"
     SHAPE_RENDER_ENABLED=1
-
-    local shape_length; shape__get_length "$SHAPE"
-    SHAPE_LENGTH=$shape_length
-
     SHAPE_PLACEHOLDER=O
     local placeholders; fill_array placeholders "$SHAPE_LENGTH" "$SHAPE_PLACEHOLDER"
     SHAPE_PLACEHOLDERS=("${placeholders[@]}")
@@ -26,7 +21,7 @@ init_shape_view() {
 shape_view__get_height() {
     local result="${1:?}"
 
-    local actual_height; shape__get_actual_height "$SHAPE" "$SHAPE_ROTATION" actual_height
+    local actual_height; shape__get_actual_height "$SHAPE_ROTATION" actual_height
 
     eval "$result=\$actual_height"
 }
@@ -34,7 +29,7 @@ shape_view__get_height() {
 shape_view__get_width() {
     local result="${1:?}"
 
-    local actual_width; shape__get_actual_width "$SHAPE" "$SHAPE_ROTATION" actual_width
+    local actual_width; shape__get_actual_width "$SHAPE_ROTATION" actual_width
 
     eval "$result=\$actual_width"
 }
@@ -89,7 +84,7 @@ _shape_view__render() {
         canvas__free "$SHAPE_CANVAS"
     fi
 
-    local shape_canvas; shape__get_canvas "$SHAPE" "$SHAPE_ROW" "$SHAPE_COL" "$SHAPE_ROTATION" "$SHAPE_COLOR"
+    local shape_canvas; shape__get_canvas "$SHAPE_ROW" "$SHAPE_COL" "$SHAPE_ROTATION" "$SHAPE_COLOR"
     canvas__render "$shape_canvas" "${SHAPE_PLACEHOLDERS[@]}"
 
     SHAPE_CANVAS="$shape_canvas"

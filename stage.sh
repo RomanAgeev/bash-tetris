@@ -18,7 +18,7 @@ init_stage() {
 }
 
 drop_shape() {
-    init_shape_view "${1:?}"
+    init_shape_view
 
     local start_col=$(( $COL + $WIDTH / 2 - 1 ))
 

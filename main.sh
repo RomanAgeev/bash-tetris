@@ -23,8 +23,8 @@ next_shape() {
     local shape_index=$(( $RANDOM % ${#SHAPES[@]} ))
     local color_index=$(( $RANDOM % ${#COLORS[@]} ))
 
-    shape__new shape "${SHAPES[$shape_index]}"
-    drop_shape shape
+    init_shape "${SHAPES[$shape_index]}"
+    drop_shape
     shape_view__set_color "${COLORS[$color_index]}"
     shape_view__enable_auto_render
 }
