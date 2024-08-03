@@ -26,10 +26,7 @@ drop_shape() {
 }
 
 is_shape_down() {
-    local view_height; shape_view__get_height view_height
-    local view_bottom=$(( $SHAPE_ROW + $view_height ))
-
-    [ $view_bottom -ge $BOTTOM ]
+    [ $(( $SHAPE_ROW + $SHAPE_ACTUAL_HEIGHT )) -ge $BOTTOM ]
 }
 
 is_shape_left() {
@@ -37,26 +34,7 @@ is_shape_left() {
 }
 
 is_shape_right() {
-    local view_width; shape_view__get_width view_width
-    local view_right=$(( $SHAPE_COL + $view_width ))
-
-    [ $view_right -ge $RIGHT ]
-}
-
-get_shape_most_right_col() {
-    local result="${1:?}"
-
-    local view_width; shape_view__get_width view_width
-
-    eval "$result=\$((\$RIGHT - \$view_width))"
-}
-
-get_shape_most_bottom_row() {
-    local result="${1:?}"
-
-    local view_height; shape_view__get_height view_height
-
-    eval "$result=\$((\$BOTTOM - \$view_height))"
+    [ $(( $SHAPE_COL + $SHAPE_ACTUAL_WIDTH )) -ge $RIGHT ]
 }
 
 render_stage() {

@@ -18,22 +18,6 @@ init_shape_view() {
     SHAPE_SPACES=("${spaces[@]}")
 }
 
-shape_view__get_height() {
-    local result="${1:?}"
-
-    local actual_height; shape__get_actual_height "$SHAPE_ROTATION" actual_height
-
-    eval "$result=\$actual_height"
-}
-
-shape_view__get_width() {
-    local result="${1:?}"
-
-    local actual_width; shape__get_actual_width "$SHAPE_ROTATION" actual_width
-
-    eval "$result=\$actual_width"
-}
-
 shape_view__enable_auto_render() {
     [ $SHAPE_RENDER_ENABLED -eq 0 ] || {
         SHAPE_RENDER_ENABLED=0

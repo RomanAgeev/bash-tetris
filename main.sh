@@ -30,18 +30,13 @@ next_shape() {
 }
 
 on_action() {
+    init_shape_actual_size
     case $1 in
         A)
             shape_view__disable_auto_render
             shape_view__rotate_right
-            is_shape_right && {
-                local most_right_col; get_shape_most_right_col most_right_col
-                SHAPE_COL=$most_right_col
-            }
-            is_shape_down && {
-                local most_bottom_row; get_shape_most_bottom_row most_bottom_row
-                SHAPE_ROW=$most_bottom_row
-            }
+            is_shape_right && SHAPE_COL=$(( $RIGHT - $SHAPE_ACTUAL_WIDTH))
+            is_shape_down && SHAPE_ROW=$(( $BOTTOM - $SHAPE_ACTUAL_HEIGHT ))
             shape_view__move_at $SHAPE_ROW $SHAPE_COL
             shape_view__enable_auto_render
             ;;
@@ -49,8 +44,7 @@ on_action() {
         C) is_shape_right || shape_view__move_right ;;
         D) is_shape_left || shape_view__move_left ;;
         '')
-            local most_bottom_row; get_shape_most_bottom_row most_bottom_row
-            shape_view__move_at $most_bottom_row $SHAPE_COL
+            shape_view__move_at $(( $BOTTOM - $SHAPE_ACTUAL_HEIGHT )) $SHAPE_COL
             next_shape
             ;;
         q) exit ;;
@@ -59,6 +53,7 @@ on_action() {
 }
 
 on_timeout() {
+    init_shape_actual_size
     is_shape_down && next_shape || shape_view__move_down
 }
 

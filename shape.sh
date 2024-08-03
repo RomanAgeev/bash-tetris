@@ -28,24 +28,14 @@ init_shape() {
     init_shape_format 3 "${lines[@]}"
 }
 
-shape__get_actual_width() {
-    local rotation=$(( ${1:?} % 4 ))
-    local result="${2:?}"
-
-    local _actual_width;
-    [ $(( $rotation % 2 )) -eq 0 ] && _actual_width="$SHAPE_WIDTH" || _actual_width="$SHAPE_HEIGHT"
-
-    eval "$result=\$_actual_width"
-}
-
-shape__get_actual_height() {
-    local rotation=$(( ${1:?} % 4 ))
-    local result="${2:?}"
-
-    local _actual_height;
-    [ $(( $rotation % 2 )) -eq 0 ] && _actual_height="$SHAPE_HEIGHT" || _actual_height="$SHAPE_WIDTH"
-
-    eval "$result=\$_actual_height"
+init_shape_actual_size() {
+    [ $(( $SHAPE_ROTATION % 2 )) -eq 0 ] && {
+        SHAPE_ACTUAL_WIDTH=$SHAPE_WIDTH
+        SHAPE_ACTUAL_HEIGHT=$SHAPE_HEIGHT
+    } || {
+        SHAPE_ACTUAL_WIDTH=$SHAPE_HEIGHT
+        SHAPE_ACTUAL_HEIGHT=$SHAPE_WIDTH
+    }
 }
 
 init_shape_canvas() {
