@@ -9,12 +9,6 @@ source $my_path/valid_int.sh
 source $my_path/array.sh
 
 # shellcheck source=/dev/null
-source $my_path/template.sh
-
-# shellcheck source=/dev/null
-source $my_path/class.sh
-
-# shellcheck source=/dev/null
 source $my_path/timestamp.sh
 
 # shellcheck source=/dev/null
