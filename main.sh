@@ -1,6 +1,7 @@
 #!/bin/bash
 
 set -uo pipefail
+shopt -s extglob
 
 source ./utils/_main.sh
 source ./shape.sh
@@ -24,7 +25,6 @@ COLORS=("$RED" "$GREEN" "$YELLOW" "$BLUE" "$MAGENTA" "$CYAN" "$WHITE")
 
 set_foreground "$NEUTRAL"
 set_background "$NEUTRAL"
-init_stage 10 60 50 30
 
 next_shape() {
     local shape_index=$(( $RANDOM % ${#SHAPES[@]} ))

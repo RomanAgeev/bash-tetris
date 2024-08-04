@@ -73,8 +73,30 @@ init_shape_format() {
 
     local format=()
     for line in "${lines[@]}"; do
-        local line_format="${line//[^.]/%s}"
-        line_format="${line_format//./ %.0s}"
+        local line_format=
+        local line_length=""${#line}
+        while [ $line_length -gt 0 ]; do
+            local empty_tail="${line#+(.)}"
+            local empty_length=$(( $line_length - ${#empty_tail} ))
+
+            [ $empty_length -gt 0 ] && {
+                local empty;
+                printf -v empty "$CUR_RIGHT_N" "$empty_length"
+                line_format="$line_format$empty"
+                line_length="${#empty_tail}"
+                line="$empty_tail"
+            }
+
+            local full_tail="${line#+([^.])}"
+            local full_length=$(( $line_length - ${#full_tail} ))
+
+            [ $full_length -gt 0 ] && {
+                local full="${line:0:$full_length}"
+                line_format="$line_format${full//[^.]/%s}"
+                line_length=""${#full_tail}
+                line="$full_tail"
+            }
+        done
         format+=( "$line_format" )
     done
 

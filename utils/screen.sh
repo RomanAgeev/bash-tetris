@@ -11,6 +11,7 @@ CUR_SAVE="${CSI}s"
 CUR_RESTORE="${CSI}u"
 CUR_UP_N="${CSI}%sA"
 CUR_DOWN_N="${CSI}%sB"
+CUR_RIGHT_N="${CSI}%sC"
 
 printf -v CUR_UP "$CUR_UP_N" "1"
 printf -v CUR_DOWN "$CUR_DOWN_N" "1"
