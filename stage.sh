@@ -2,7 +2,6 @@
 
 source ./utils/_main.sh
 source ./canvas.sh
-source ./shape_view.sh
 
 WALL="|"
 FLOOR="_"
@@ -18,9 +17,9 @@ init_stage() {
 }
 
 drop_shape() {
-    local start_col=$(( $COL + $WIDTH / 2 - 1 ))
-
-    move_shape_at "$ROW" "$start_col"
+    SHAPE_ROW=$ROW
+    SHAPE_COL=$(( $COL + $WIDTH / 2 - 1 ))
+    render_shape
 }
 
 is_shape_down() {

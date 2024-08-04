@@ -4,7 +4,6 @@ set -uo pipefail
 
 source ./utils/_main.sh
 source ./shape.sh
-source ./shape_view.sh
 source ./canvas.sh
 source ./stage.sh
 source ./loop.sh
@@ -25,26 +24,34 @@ next_shape() {
 
     init_shape "${SHAPES[$shape_index]}"
     drop_shape
-    set_shape_color "${COLORS[$color_index]}"
-    enable_shape_auto_render
+    SHAPE_COLOR="${COLORS[$color_index]}"
+    render_shape
 }
 
 on_action() {
     init_shape_actual_size
     case $1 in
         A)
-            disable_shape_auto_render
-            rotate_shape
+            SHAPE_ROTATION=$(( ($SHAPE_ROTATION + 1) % 4 ))
             is_shape_right && SHAPE_COL=$(( $RIGHT - $SHAPE_ACTUAL_WIDTH))
             is_shape_down && SHAPE_ROW=$(( $BOTTOM - $SHAPE_ACTUAL_HEIGHT ))
-            move_shape_at $SHAPE_ROW $SHAPE_COL
-            enable_shape_auto_render
+            render_shape
             ;;
-        B) is_shape_down || move_shape_down ;;
-        C) is_shape_right || move_shape_right ;;
-        D) is_shape_left || move_shape_left ;;
+        B) is_shape_down || {
+            SHAPE_ROW=$(( $SHAPE_ROW + 1 ))
+            render_shape
+        } ;;
+        C) is_shape_right || {
+            SHAPE_COL=$(( $SHAPE_COL + 1 ))
+            render_shape
+        } ;;
+        D) is_shape_left || {
+            SHAPE_COL=$(( $SHAPE_COL - 1 ))
+            render_shape
+        } ;;
         '')
-            move_shape_at $(( $BOTTOM - $SHAPE_ACTUAL_HEIGHT )) $SHAPE_COL
+            SHAPE_ROW=$(( $BOTTOM - $SHAPE_ACTUAL_HEIGHT ))
+            render_shape
             next_shape
             ;;
         q) exit ;;
@@ -54,7 +61,10 @@ on_action() {
 
 on_timeout() {
     init_shape_actual_size
-    is_shape_down && next_shape || move_shape_down
+    is_shape_down && next_shape || {
+        SHAPE_ROW=$(( $SHAPE_ROW + 1 ))
+        render_shape
+    }
 }
 
 on_exit() {

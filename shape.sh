@@ -32,54 +32,11 @@ init_shape() {
     SHAPE_COL=0
     SHAPE_ROTATION=0
     SHAPE_COLOR="$WHITE"
-    SHAPE_RENDER_ENABLED=1
     SHAPE_PLACEHOLDER=O
     local placeholders; fill_array placeholders "$SHAPE_LENGTH" "$SHAPE_PLACEHOLDER"
     SHAPE_PLACEHOLDERS=("${placeholders[@]}")
     local spaces; fill_array spaces "$SHAPE_LENGTH"
     SHAPE_SPACES=("${spaces[@]}")
-}
-
-enable_shape_auto_render() {
-    [ $SHAPE_RENDER_ENABLED -eq 0 ] || {
-        SHAPE_RENDER_ENABLED=0
-        _shape_view__render
-    }
-}
-
-disable_shape_auto_render() {
-    SHAPE_RENDER_ENABLED=1
-}
-
-move_shape_at() {
-    SHAPE_ROW=${1:?}
-    SHAPE_COL=${2:?}
-    _shape_view__render
-}
-
-move_shape_left() {
-    SHAPE_COL=$(( $SHAPE_COL - 1 ))
-    _shape_view__render
-}
-
-move_shape_right() {
-    SHAPE_COL=$(( $SHAPE_COL + 1 ))
-    _shape_view__render
-}
-
-move_shape_down() {
-    SHAPE_ROW=$(( $SHAPE_ROW + 1 ))
-    _shape_view__render
-}
-
-rotate_shape() {
-    SHAPE_ROTATION=$(( ($SHAPE_ROTATION + 1) % 4 ))
-    _shape_view__render
-}
-
-set_shape_color() {
-    SHAPE_COLOR="${1:?}"
-    _shape_view__render
 }
 
 init_shape_actual_size() {
@@ -92,9 +49,7 @@ init_shape_actual_size() {
     }
 }
 
-_shape_view__render() {
-    [ $SHAPE_RENDER_ENABLED -eq 0 ] || return 0
-
+render_shape() {
     if [ -n "$SHAPE_CANVAS" ]; then
         CANVAS="$SHAPE_CANVAS"
         render_canvas "${SHAPE_SPACES[@]}"
