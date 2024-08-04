@@ -30,6 +30,7 @@ next_shape() {
     local shape_index=$(( $RANDOM % ${#SHAPES[@]} ))
     local color_index=$(( $RANDOM % ${#COLORS[@]} ))
     init_shape "${SHAPES[$shape_index]}" "${COLORS[$color_index]}" $STAGE_ROW $(( $STAGE_COL + $STAGE_WIDTH / 2 - 1 )) O
+    calc_shape_actual_size
     render_shape
 }
 
@@ -43,6 +44,16 @@ is_shape_left() {
 
 is_shape_right() {
     [ $(( $SHAPE_COL + $SHAPE_ACTUAL_WIDTH )) -ge $STAGE_RIGHT ]
+}
+
+calc_shape_actual_size() {
+    [ $(( $SHAPE_ROTATION % 2 )) -eq 0 ] && {
+        SHAPE_ACTUAL_WIDTH=$SHAPE_WIDTH
+        SHAPE_ACTUAL_HEIGHT=$SHAPE_HEIGHT
+    } || {
+        SHAPE_ACTUAL_WIDTH=$SHAPE_HEIGHT
+        SHAPE_ACTUAL_HEIGHT=$SHAPE_WIDTH
+    }
 }
 
 render_stage() {
@@ -65,10 +76,10 @@ render_stage() {
 }
 
 on_action() {
-    update_shape_actual_size
     case $1 in
         A)
             SHAPE_ROTATION=$(( ($SHAPE_ROTATION + 1) % 4 ))
+            calc_shape_actual_size
             is_shape_right && SHAPE_COL=$(( $STAGE_RIGHT - $SHAPE_ACTUAL_WIDTH))
             is_shape_down && SHAPE_ROW=$(( $STAGE_BOTTOM - $SHAPE_ACTUAL_HEIGHT ))
             render_shape
@@ -96,7 +107,6 @@ on_action() {
 }
 
 on_timeout() {
-    update_shape_actual_size
     is_shape_down && next_shape || {
         SHAPE_ROW=$(( $SHAPE_ROW + 1 ))
         render_shape

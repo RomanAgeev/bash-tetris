@@ -43,16 +43,6 @@ init_shape() {
     SHAPE_SPACES=("${spaces[@]}")
 }
 
-update_shape_actual_size() {
-    [ $(( $SHAPE_ROTATION % 2 )) -eq 0 ] && {
-        SHAPE_ACTUAL_WIDTH=$SHAPE_WIDTH
-        SHAPE_ACTUAL_HEIGHT=$SHAPE_HEIGHT
-    } || {
-        SHAPE_ACTUAL_WIDTH=$SHAPE_HEIGHT
-        SHAPE_ACTUAL_HEIGHT=$SHAPE_WIDTH
-    }
-}
-
 render_shape() {
     if [ -n "$SHAPE_CANVAS" ]; then
         CANVAS="$SHAPE_CANVAS"
