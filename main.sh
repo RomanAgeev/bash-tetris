@@ -23,9 +23,6 @@ STAGE_INNER=$(( $STAGE_WIDTH - 1 ))
 SHAPES=("xx xx" "xx. .xx" "x.. xxx" "xxxx" "..x xxx" ".xx xx." ".x. xxx")
 COLORS=("$RED" "$GREEN" "$YELLOW" "$BLUE" "$MAGENTA" "$CYAN" "$WHITE")
 
-set_foreground "$NEUTRAL"
-set_background "$NEUTRAL"
-
 next_shape() {
     local shape_index=$(( $RANDOM % ${#SHAPES[@]} ))
     local color_index=$(( $RANDOM % ${#COLORS[@]} ))
@@ -122,6 +119,8 @@ on_exit() {
 trap "on_exit" EXIT
 
 clear
+set_foreground "$NEUTRAL"
+set_background "$NEUTRAL"
 hide_cursor
 render_stage
 next_shape

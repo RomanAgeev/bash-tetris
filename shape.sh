@@ -83,7 +83,7 @@ init_shape_format() {
                 local empty;
                 printf -v empty "$CUR_RIGHT_N" "$empty_length"
                 line_format="$line_format$empty"
-                line_length="${#empty_tail}"
+                line_length=${#empty_tail}
                 line="$empty_tail"
             }
 
@@ -93,7 +93,7 @@ init_shape_format() {
             [ $full_length -gt 0 ] && {
                 local full="${line:0:$full_length}"
                 line_format="$line_format${full//[^.]/%s}"
-                line_length=""${#full_tail}
+                line_length=${#full_tail}
                 line="$full_tail"
             }
         done
