@@ -5,7 +5,10 @@ source ./canvas.sh
 
 init_shape() {
     local string="${1:?}"
-    local color="${2:-$WHITE}"
+    local color="${2:?}"
+    local row="${3:?}"
+    local col="${4:?}"
+    local placeholder="${5:?}"
 
     local lines
     local IFS
@@ -29,11 +32,11 @@ init_shape() {
     init_shape_format 3 "${lines[@]}"
 
     SHAPE_CANVAS=
-    SHAPE_ROW=0
-    SHAPE_COL=0
+    SHAPE_ROW=$row
+    SHAPE_COL=$col
     SHAPE_ROTATION=0
     SHAPE_COLOR="$color"
-    SHAPE_PLACEHOLDER=O
+    SHAPE_PLACEHOLDER="$placeholder"
     local placeholders; fill_array placeholders "$SHAPE_LENGTH" "$SHAPE_PLACEHOLDER"
     SHAPE_PLACEHOLDERS=("${placeholders[@]}")
     local spaces; fill_array spaces "$SHAPE_LENGTH"

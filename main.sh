@@ -5,12 +5,20 @@ set -uo pipefail
 source ./utils/_main.sh
 source ./shape.sh
 source ./canvas.sh
-source ./stage.sh
 source ./loop.sh
 
 require bc
 require gdate
 
+WALL="|"
+FLOOR="_"
+STAGE_ROW=10
+STAGE_COL=60
+STAGE_WIDTH=50
+STAGE_HEIGHT=30
+STAGE_BOTTOM=$(( $STAGE_ROW + $STAGE_HEIGHT ))
+STAGE_RIGHT=$(( $STAGE_COL + $STAGE_WIDTH ))
+STAGE_INNER=$(( $STAGE_WIDTH - 1 ))
 SHAPES=("xx xx" "xx. .xx" "x.. xxx" "xxxx" "..x xxx" ".xx xx." ".x. xxx")
 COLORS=("$RED" "$GREEN" "$YELLOW" "$BLUE" "$MAGENTA" "$CYAN" "$WHITE")
 
@@ -21,10 +29,39 @@ init_stage 10 60 50 30
 next_shape() {
     local shape_index=$(( $RANDOM % ${#SHAPES[@]} ))
     local color_index=$(( $RANDOM % ${#COLORS[@]} ))
-
-    init_shape "${SHAPES[$shape_index]}" "${COLORS[$color_index]}"
-    drop_shape
+    init_shape "${SHAPES[$shape_index]}" "${COLORS[$color_index]}" $STAGE_ROW $(( $STAGE_COL + $STAGE_WIDTH / 2 - 1 )) O
     render_shape
+}
+
+is_shape_down() {
+    [ $(( $SHAPE_ROW + $SHAPE_ACTUAL_HEIGHT )) -ge $STAGE_BOTTOM ]
+}
+
+is_shape_left() {
+    [ $SHAPE_COL -le $(( $STAGE_COL + 1 )) ]
+}
+
+is_shape_right() {
+    [ $(( $SHAPE_COL + $SHAPE_ACTUAL_WIDTH )) -ge $STAGE_RIGHT ]
+}
+
+render_stage() {
+    local line;
+    printf -v line "$WALL%$STAGE_INNER.${STAGE_INNER}s$WALL" " "
+
+    init_canvas
+    set_canvas_foreground $WHITE
+    set_canvas_cursor_at $STAGE_ROW $STAGE_COL
+    for (( i = 0; i<$STAGE_HEIGHT - 1; i++ )); do
+        add_canvas_format_line "$line"
+    done
+
+    local bottom_line;
+    printf -v bottom_line "$WALL%$STAGE_INNER.${STAGE_INNER}s$WALL" " "
+    bottom_line="${bottom_line// /$FLOOR}"
+    add_canvas_format_line "$bottom_line"
+
+    render_canvas
 }
 
 on_action() {
@@ -32,8 +69,8 @@ on_action() {
     case $1 in
         A)
             SHAPE_ROTATION=$(( ($SHAPE_ROTATION + 1) % 4 ))
-            is_shape_right && SHAPE_COL=$(( $RIGHT - $SHAPE_ACTUAL_WIDTH))
-            is_shape_down && SHAPE_ROW=$(( $BOTTOM - $SHAPE_ACTUAL_HEIGHT ))
+            is_shape_right && SHAPE_COL=$(( $STAGE_RIGHT - $SHAPE_ACTUAL_WIDTH))
+            is_shape_down && SHAPE_ROW=$(( $STAGE_BOTTOM - $SHAPE_ACTUAL_HEIGHT ))
             render_shape
             ;;
         B) is_shape_down || {
@@ -49,7 +86,7 @@ on_action() {
             render_shape
         } ;;
         '')
-            SHAPE_ROW=$(( $BOTTOM - $SHAPE_ACTUAL_HEIGHT ))
+            SHAPE_ROW=$(( $STAGE_BOTTOM - $SHAPE_ACTUAL_HEIGHT ))
             render_shape
             next_shape
             ;;
