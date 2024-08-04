@@ -26,6 +26,60 @@ init_shape() {
     init_shape_format 1 "${lines[@]}"
     init_shape_format 2 "${lines[@]}"
     init_shape_format 3 "${lines[@]}"
+
+    SHAPE_CANVAS=
+    SHAPE_ROW=0
+    SHAPE_COL=0
+    SHAPE_ROTATION=0
+    SHAPE_COLOR="$WHITE"
+    SHAPE_RENDER_ENABLED=1
+    SHAPE_PLACEHOLDER=O
+    local placeholders; fill_array placeholders "$SHAPE_LENGTH" "$SHAPE_PLACEHOLDER"
+    SHAPE_PLACEHOLDERS=("${placeholders[@]}")
+    local spaces; fill_array spaces "$SHAPE_LENGTH"
+    SHAPE_SPACES=("${spaces[@]}")
+}
+
+enable_shape_auto_render() {
+    [ $SHAPE_RENDER_ENABLED -eq 0 ] || {
+        SHAPE_RENDER_ENABLED=0
+        _shape_view__render
+    }
+}
+
+disable_shape_auto_render() {
+    SHAPE_RENDER_ENABLED=1
+}
+
+move_shape_at() {
+    SHAPE_ROW=${1:?}
+    SHAPE_COL=${2:?}
+    _shape_view__render
+}
+
+move_shape_left() {
+    SHAPE_COL=$(( $SHAPE_COL - 1 ))
+    _shape_view__render
+}
+
+move_shape_right() {
+    SHAPE_COL=$(( $SHAPE_COL + 1 ))
+    _shape_view__render
+}
+
+move_shape_down() {
+    SHAPE_ROW=$(( $SHAPE_ROW + 1 ))
+    _shape_view__render
+}
+
+rotate_shape() {
+    SHAPE_ROTATION=$(( ($SHAPE_ROTATION + 1) % 4 ))
+    _shape_view__render
+}
+
+set_shape_color() {
+    SHAPE_COLOR="${1:?}"
+    _shape_view__render
 }
 
 init_shape_actual_size() {
@@ -38,7 +92,14 @@ init_shape_actual_size() {
     }
 }
 
-init_shape_canvas() {
+_shape_view__render() {
+    [ $SHAPE_RENDER_ENABLED -eq 0 ] || return 0
+
+    if [ -n "$SHAPE_CANVAS" ]; then
+        CANVAS="$SHAPE_CANVAS"
+        render_canvas "${SHAPE_SPACES[@]}"
+    fi
+
     eval "local format=( \"\${SHAPE_FORMAT_$SHAPE_ROTATION[@]}\" )"
 
     init_canvas
@@ -47,6 +108,8 @@ init_shape_canvas() {
     for line in "${format[@]}"; do
         add_canvas_format_line "$line"
     done
+
+    render_canvas "${SHAPE_PLACEHOLDERS[@]}"
 
     SHAPE_CANVAS=$CANVAS
 }

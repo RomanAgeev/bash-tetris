@@ -25,26 +25,26 @@ next_shape() {
 
     init_shape "${SHAPES[$shape_index]}"
     drop_shape
-    shape_view__set_color "${COLORS[$color_index]}"
-    shape_view__enable_auto_render
+    set_shape_color "${COLORS[$color_index]}"
+    enable_shape_auto_render
 }
 
 on_action() {
     init_shape_actual_size
     case $1 in
         A)
-            shape_view__disable_auto_render
-            shape_view__rotate_right
+            disable_shape_auto_render
+            rotate_shape
             is_shape_right && SHAPE_COL=$(( $RIGHT - $SHAPE_ACTUAL_WIDTH))
             is_shape_down && SHAPE_ROW=$(( $BOTTOM - $SHAPE_ACTUAL_HEIGHT ))
-            shape_view__move_at $SHAPE_ROW $SHAPE_COL
-            shape_view__enable_auto_render
+            move_shape_at $SHAPE_ROW $SHAPE_COL
+            enable_shape_auto_render
             ;;
-        B) is_shape_down || shape_view__move_down ;;
-        C) is_shape_right || shape_view__move_right ;;
-        D) is_shape_left || shape_view__move_left ;;
+        B) is_shape_down || move_shape_down ;;
+        C) is_shape_right || move_shape_right ;;
+        D) is_shape_left || move_shape_left ;;
         '')
-            shape_view__move_at $(( $BOTTOM - $SHAPE_ACTUAL_HEIGHT )) $SHAPE_COL
+            move_shape_at $(( $BOTTOM - $SHAPE_ACTUAL_HEIGHT )) $SHAPE_COL
             next_shape
             ;;
         q) exit ;;
@@ -54,7 +54,7 @@ on_action() {
 
 on_timeout() {
     init_shape_actual_size
-    is_shape_down && next_shape || shape_view__move_down
+    is_shape_down && next_shape || move_shape_down
 }
 
 on_exit() {

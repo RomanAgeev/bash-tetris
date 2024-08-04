@@ -18,11 +18,9 @@ init_stage() {
 }
 
 drop_shape() {
-    init_shape_view
-
     local start_col=$(( $COL + $WIDTH / 2 - 1 ))
 
-    shape_view__move_at "$ROW" "$start_col"
+    move_shape_at "$ROW" "$start_col"
 }
 
 is_shape_down() {
