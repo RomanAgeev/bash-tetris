@@ -113,7 +113,6 @@ on_timeout() {
 on_exit() {
     clear
     show_cursor
-    echo
 }
 
 trap "on_exit" EXIT
