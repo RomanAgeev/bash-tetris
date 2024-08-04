@@ -19,7 +19,6 @@ init_stage() {
 drop_shape() {
     SHAPE_ROW=$ROW
     SHAPE_COL=$(( $COL + $WIDTH / 2 - 1 ))
-    render_shape
 }
 
 is_shape_down() {

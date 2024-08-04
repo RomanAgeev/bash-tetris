@@ -5,6 +5,7 @@ source ./canvas.sh
 
 init_shape() {
     local string="${1:?}"
+    local color="${2:-$WHITE}"
 
     local lines
     local IFS
@@ -31,7 +32,7 @@ init_shape() {
     SHAPE_ROW=0
     SHAPE_COL=0
     SHAPE_ROTATION=0
-    SHAPE_COLOR="$WHITE"
+    SHAPE_COLOR="$color"
     SHAPE_PLACEHOLDER=O
     local placeholders; fill_array placeholders "$SHAPE_LENGTH" "$SHAPE_PLACEHOLDER"
     SHAPE_PLACEHOLDERS=("${placeholders[@]}")
@@ -39,7 +40,7 @@ init_shape() {
     SHAPE_SPACES=("${spaces[@]}")
 }
 
-init_shape_actual_size() {
+update_shape_actual_size() {
     [ $(( $SHAPE_ROTATION % 2 )) -eq 0 ] && {
         SHAPE_ACTUAL_WIDTH=$SHAPE_WIDTH
         SHAPE_ACTUAL_HEIGHT=$SHAPE_HEIGHT

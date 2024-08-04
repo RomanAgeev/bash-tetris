@@ -22,14 +22,13 @@ next_shape() {
     local shape_index=$(( $RANDOM % ${#SHAPES[@]} ))
     local color_index=$(( $RANDOM % ${#COLORS[@]} ))
 
-    init_shape "${SHAPES[$shape_index]}"
+    init_shape "${SHAPES[$shape_index]}" "${COLORS[$color_index]}"
     drop_shape
-    SHAPE_COLOR="${COLORS[$color_index]}"
     render_shape
 }
 
 on_action() {
-    init_shape_actual_size
+    update_shape_actual_size
     case $1 in
         A)
             SHAPE_ROTATION=$(( ($SHAPE_ROTATION + 1) % 4 ))
@@ -60,7 +59,7 @@ on_action() {
 }
 
 on_timeout() {
-    init_shape_actual_size
+    update_shape_actual_size
     is_shape_down && next_shape || {
         SHAPE_ROW=$(( $SHAPE_ROW + 1 ))
         render_shape
