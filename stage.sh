@@ -41,17 +41,17 @@ render_stage() {
     local line;
     printf -v line "$WALL%$WIDTH_INNER.${WIDTH_INNER}s$WALL" " "
 
-    canvas__new stage_canvas
-    canvas__set_foreground stage_canvas $WHITE
-    canvas__cursor_at stage_canvas $ROW $COL
+    init_canvas
+    set_canvas_foreground $WHITE
+    set_canvas_cursor_at $ROW $COL
     for (( i = 0; i<$HEIGHT - 1; i++ )); do
-        canvas__add_format_line stage_canvas "$line"
+        add_canvas_format_line "$line"
     done
 
     local bottom_line;
     printf -v bottom_line "$WALL%$WIDTH_INNER.${WIDTH_INNER}s$WALL" " "
     bottom_line="${bottom_line// /$FLOOR}"
-    canvas__add_format_line stage_canvas "$bottom_line"
+    add_canvas_format_line "$bottom_line"
 
-    canvas__render stage_canvas
+    render_canvas
 }

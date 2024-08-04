@@ -41,14 +41,14 @@ init_shape_actual_size() {
 init_shape_canvas() {
     eval "local format=( \"\${SHAPE_FORMAT_$SHAPE_ROTATION[@]}\" )"
 
-    canvas__new canvas
-    canvas__set_foreground canvas "$SHAPE_COLOR"
-    canvas__cursor_at canvas "$SHAPE_ROW" "$SHAPE_COL"
+    init_canvas
+    set_canvas_foreground "$SHAPE_COLOR"
+    set_canvas_cursor_at "$SHAPE_ROW" "$SHAPE_COL"
     for line in "${format[@]}"; do
-        canvas__add_format_line canvas "$line"
+        add_canvas_format_line "$line"
     done
 
-    SHAPE_CANVAS=canvas
+    SHAPE_CANVAS=$CANVAS
 }
 
 init_shape_format() {

@@ -64,10 +64,10 @@ _shape_view__render() {
     [ $SHAPE_RENDER_ENABLED -eq 0 ] || return 0
 
     if [ -n "$SHAPE_CANVAS" ]; then
-        canvas__render "$SHAPE_CANVAS" "${SHAPE_SPACES[@]}"
-        canvas__free "$SHAPE_CANVAS"
+        CANVAS="$SHAPE_CANVAS"
+        render_canvas "${SHAPE_SPACES[@]}"
     fi
 
     init_shape_canvas
-    canvas__render "$SHAPE_CANVAS" "${SHAPE_PLACEHOLDERS[@]}"
+    render_canvas "${SHAPE_PLACEHOLDERS[@]}"
 }
