@@ -6,6 +6,10 @@ init_heap() {
     done
 }
 
+set_heap() {
+    eval "HEAP_${1:?}[${2:?}]=\"\${3:-$TRANSPARENT}\""
+}
+
 render_heap() {
     init_canvas
     for (( i=0; i<$STAGE_INNER; i++ )); do
@@ -61,9 +65,9 @@ update_heap() {
             local heap_j=$(( $STAGE_BOTTOM - $SHAPE_ROW - $j - 1 ))
             eval "local heap_height=\${#HEAP_$heap_i[@]}"
             for (( k=$heap_j-1; k>=$heap_height; k-- )); do
-                eval "HEAP_$heap_i[$k]=\"\$TRANSPARENT\""
+                set_heap $heap_i $k
             done
-            eval "HEAP_$heap_i[$heap_j]=\"\$color\""
+            set_heap $heap_i $heap_j $color
         done
     done
 }
