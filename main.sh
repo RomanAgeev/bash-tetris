@@ -7,12 +7,14 @@ source ./utils/_main.sh
 source ./shape.sh
 source ./canvas.sh
 source ./loop.sh
+source ./heap.sh
 
 require bc
 require gdate
 
 WALL="|"
-FLOOR="_"
+FLOOR=_
+PLACEHOLDER=O
 STAGE_ROW=10
 STAGE_COL=60
 STAGE_WIDTH=50
@@ -26,7 +28,7 @@ COLORS=("$RED" "$GREEN" "$YELLOW" "$BLUE" "$MAGENTA" "$CYAN" "$WHITE")
 next_shape() {
     local shape_index=$(( $RANDOM % ${#SHAPES[@]} ))
     local color_index=$(( $RANDOM % ${#COLORS[@]} ))
-    init_shape "${SHAPES[$shape_index]}" "${COLORS[$color_index]}" $STAGE_ROW $(( $STAGE_COL + $STAGE_WIDTH / 2 - 1 )) O
+    init_shape "${SHAPES[$shape_index]}" "${COLORS[$color_index]}" $STAGE_ROW $(( $STAGE_COL + $STAGE_WIDTH / 2 - 1 )) "$PLACEHOLDER"
     calc_shape_actual_size
     render_shape
 }
@@ -104,7 +106,11 @@ on_action() {
 }
 
 on_timeout() {
-    is_shape_down && next_shape || {
+    (is_heap_hit || is_shape_down) && {
+        update_heap
+        render_heap
+        next_shape
+    } || {
         SHAPE_ROW=$(( $SHAPE_ROW + 1 ))
         render_shape
     }
@@ -122,6 +128,7 @@ set_foreground "$NEUTRAL"
 set_background "$NEUTRAL"
 hide_cursor
 render_stage
+init_heap
 next_shape
 
-loop on_action on_timeout 300
+loop on_action on_timeout 100

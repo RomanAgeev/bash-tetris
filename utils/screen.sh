@@ -15,7 +15,9 @@ CUR_RIGHT_N="${CSI}%sC"
 
 printf -v CUR_UP "$CUR_UP_N" "1"
 printf -v CUR_DOWN "$CUR_DOWN_N" "1"
+printf -v CUR_RIGHT "$CUR_RIGHT_N" "1"
 
+TRANSPARENT=-1
 BLACK=0
 RED=1
 GREEN=2
