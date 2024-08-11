@@ -46,10 +46,9 @@ is_heap_hit() {
         [ $heap_top -lt $top ] && heap_top=$top
         for (( j=$heap_top; j<=$bottom; j++ )); do
             local line_j=$(( $j - $top ))
+            local heap_j=$(( $STAGE_BOTTOM - $j - 1 ))
             local shape_line="${shape_lines[$line_j]}"
-            [ "${shape_line:$i:1}" != "." ] && {
-                return 0
-            }
+            ([ "${shape_line:$i:1}" != "." ] && [ ${heap[$heap_j]} -ne $TRANSPARENT ]) && return 0
         done
     done
     return 1
