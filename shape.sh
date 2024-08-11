@@ -44,10 +44,7 @@ init_shape() {
 }
 
 render_shape() {
-    if [ -n "$SHAPE_CANVAS" ]; then
-        CANVAS="$SHAPE_CANVAS"
-        render_canvas "${SHAPE_SPACES[@]}"
-    fi
+    clear_shape
 
     eval "local format=( \"\${SHAPE_FORMAT_$SHAPE_ROTATION[@]}\" )"
 
@@ -61,6 +58,13 @@ render_shape() {
     render_canvas "${SHAPE_PLACEHOLDERS[@]}"
 
     SHAPE_CANVAS=$CANVAS
+}
+
+clear_shape() {
+    if [ -n "$SHAPE_CANVAS" ]; then
+        CANVAS="$SHAPE_CANVAS"
+        render_canvas "${SHAPE_SPACES[@]}"
+    fi
 }
 
 init_shape_format() {

@@ -19,16 +19,20 @@ render_heap() {
             [ $color -ne $TRANSPARENT ] && {
                 set_canvas_cursor_at $(( $STAGE_BOTTOM - $j - 1 )) $(( $STAGE_COL + $i + 1 ))
                 set_canvas_foreground $color
-                add_canvas_string X
+                add_canvas_string $PLACEHOLDER
             }
         done
     done
     render_canvas
 }
 
-is_next_heap_hit() {
-    local left=$SHAPE_COL
-    local top=$(( $SHAPE_ROW + 1 ))
+is_heap_hit() {
+    local shift_down=${1:-1}
+    local shift_left=${2:-0}
+    local shift_right=${3:-0}
+
+    local left=$(( $SHAPE_COL - $shift_left + $shift_right ))
+    local top=$(( $SHAPE_ROW + $shift_down ))
     local right=$(( $left + $SHAPE_ACTUAL_WIDTH - 1 ))
     local bottom=$(( $top + $SHAPE_ACTUAL_HEIGHT - 1 ))
 

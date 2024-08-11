@@ -83,30 +83,35 @@ on_action() {
             is_shape_down && SHAPE_ROW=$(( $STAGE_BOTTOM - $SHAPE_ACTUAL_HEIGHT ))
             render_shape
             ;;
-        B) is_shape_down || {
-            SHAPE_ROW=$(( $SHAPE_ROW + 1 ))
-            render_shape
-        } ;;
-        C) is_shape_right || {
-            SHAPE_COL=$(( $SHAPE_COL + 1 ))
-            render_shape
-        } ;;
-        D) is_shape_left || {
-            SHAPE_COL=$(( $SHAPE_COL - 1 ))
-            render_shape
-        } ;;
-        '')
-            SHAPE_ROW=$(( $STAGE_BOTTOM - $SHAPE_ACTUAL_HEIGHT ))
-            render_shape
-            next_shape
-            ;;
+        B) move_shape_down ;;
+        C) move_shape_right ;;
+        D) move_shape_left ;;
+        '') drop_shape_down ;;
         q) exit ;;
         *) return 1 ;;
     esac
 }
 
 on_timeout() {
-    (is_next_heap_hit || is_shape_down) && {
+    move_shape_down
+}
+
+move_shape_left() {
+    (is_heap_hit 0 1 0 || is_shape_left) || {
+        SHAPE_COL=$(( $SHAPE_COL - 1 ))
+        render_shape
+    }
+}
+
+move_shape_right() {
+    (is_heap_hit 0 0 1 || is_shape_right) || {
+        SHAPE_COL=$(( $SHAPE_COL + 1 ))
+        render_shape
+    }
+}
+
+move_shape_down() {
+    (is_heap_hit || is_shape_down) && {
         update_heap
         render_heap
         next_shape
@@ -114,6 +119,16 @@ on_timeout() {
         SHAPE_ROW=$(( $SHAPE_ROW + 1 ))
         render_shape
     }
+}
+
+drop_shape_down() {
+    while (! is_shape_down && ! is_heap_hit); do
+        SHAPE_ROW=$(( $SHAPE_ROW + 1 ))
+    done
+    clear_shape
+    update_heap
+    render_heap
+    next_shape
 }
 
 on_exit() {
@@ -131,4 +146,4 @@ render_stage
 init_heap
 next_shape
 
-loop on_action on_timeout 100
+loop on_action on_timeout 300
