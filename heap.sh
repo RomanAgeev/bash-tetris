@@ -26,41 +26,45 @@ render_heap() {
     render_canvas
 }
 
-is_heap_hit() {
+is_next_heap_hit() {
     local left=$SHAPE_COL
-    local top=$SHAPE_ROW
-    local right=$(( $SHAPE_COL + $SHAPE_ACTUAL_WIDTH - 1 ))
-    local bottom=$(( $SHAPE_ROW + $SHAPE_ACTUAL_HEIGHT - 1 ))
+    local top=$(( $SHAPE_ROW + 1 ))
+    local right=$(( $left + $SHAPE_ACTUAL_WIDTH - 1 ))
+    local bottom=$(( $top + $SHAPE_ACTUAL_HEIGHT - 1 ))
 
     eval "local shape_lines=( \"\${SHAPE_LINES_$SHAPE_ROTATION[@]}\" )"
 
     for (( i=0; i<$SHAPE_ACTUAL_WIDTH; i++ )); do
-        local heap_i=$(( $SHAPE_COL - $STAGE_COL + $i - 1 ))
+        local heap_i=$(( $left - $STAGE_COL + $i - 1 ))
         eval "local heap=( \"\${HEAP_$heap_i[@]}\" )"
         local heap_height=${#heap[@]}
-        local heap_top=$(( $STAGE_BOTTOM - $heap_height - 1 ))
+        local heap_top=$(( $STAGE_BOTTOM - $heap_height ))
         for (( j=$heap_top; j<=$bottom; j++ )); do
-            local line_j=$(( $heap_top - $SHAPE_ROW ))
-            [ $line_j -ge 0 ] && [ $line_j -lt $SHAPE_ACTUAL_HEIGHT ] && {
+            local line_j=$(( $heap_top - $top ))
+            local shape_line="${shape_lines[$line_j]}"
+            [ "${shape_line:$i:1}" != "." ] && {
                 return 0
             }
         done
     done
     return 1
-
-    #         if [ "${shape_line:$shape_line_index:1}" != "." ]; then
-    #             if [ -n "${heap[$j]}" ]; then
-    #                 return 0
-    #             fi
-    #         fi
 }
 
 update_heap() {
     eval "local shape_lines=( \"\${SHAPE_LINES_$SHAPE_ROTATION[@]}\" )"
     for (( i=0; i<$SHAPE_ACTUAL_WIDTH; i++ )); do
+        local flag=0
         for (( j=0; j<$SHAPE_ACTUAL_HEIGHT; j++ )); do
             local shape_line="${shape_lines[$j]}"
-            local color; [ "${shape_line:$i:1}" == "." ] && color="$TRANSPARENT" || color="$SHAPE_COLOR"
+            local color;
+            if [ "${shape_line:$i:1}" != "." ]; then
+                color="$SHAPE_COLOR"
+                flag=1
+            elif [ $flag -eq 1 ]; then
+                color="$TRANSPARENT"
+            else
+                continue
+            fi
             local heap_i=$(( $SHAPE_COL - $STAGE_COL + $i - 1 ))
             local heap_j=$(( $STAGE_BOTTOM - $SHAPE_ROW - $j - 1 ))
             eval "local heap_height=\${#HEAP_$heap_i[@]}"

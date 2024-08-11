@@ -106,7 +106,7 @@ on_action() {
 }
 
 on_timeout() {
-    (is_heap_hit || is_shape_down) && {
+    (is_next_heap_hit || is_shape_down) && {
         update_heap
         render_heap
         next_shape
