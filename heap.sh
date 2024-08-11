@@ -7,7 +7,7 @@ init_heap() {
 }
 
 set_heap() {
-    eval "HEAP_${1:?}[${2:?}]=\"\${3:-$TRANSPARENT}\""
+    eval "HEAP_${1:?}[${2:?}]=\"\${3:?}\""
 }
 
 render_heap() {
@@ -53,23 +53,19 @@ is_next_heap_hit() {
 update_heap() {
     eval "local shape_lines=( \"\${SHAPE_LINES_$SHAPE_ROTATION[@]}\" )"
     for (( i=0; i<$SHAPE_ACTUAL_WIDTH; i++ )); do
-        local flag=0
+        local j
         for (( j=0; j<$SHAPE_ACTUAL_HEIGHT; j++ )); do
             local shape_line="${shape_lines[$j]}"
-            local color;
-            if [ "${shape_line:$i:1}" != "." ]; then
-                color="$SHAPE_COLOR"
-                flag=1
-            elif [ $flag -eq 1 ]; then
-                color="$TRANSPARENT"
-            else
-                continue
-            fi
+            [ "${shape_line:$i:1}" != "." ] && break
+        done
+        for (( ; j<$SHAPE_ACTUAL_HEIGHT; j++ )); do
+            local shape_line="${shape_lines[$j]}"
+            local color; [ "${shape_line:$i:1}" != "." ] && color="$SHAPE_COLOR" || color="$TRANSPARENT"
             local heap_i=$(( $SHAPE_COL - $STAGE_COL + $i - 1 ))
             local heap_j=$(( $STAGE_BOTTOM - $SHAPE_ROW - $j - 1 ))
             eval "local heap_height=\${#HEAP_$heap_i[@]}"
             for (( k=$heap_j-1; k>=$heap_height; k-- )); do
-                set_heap $heap_i $k
+                set_heap $heap_i $k $TRANSPARENT
             done
             set_heap $heap_i $heap_j $color
         done
