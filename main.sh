@@ -33,16 +33,43 @@ next_shape() {
     render_shape
 }
 
+move_shape_right() {
+    SHAPE_COL=$(( $SHAPE_COL + 1 ))
+}
+
+move_shape_left() {
+    SHAPE_COL=$(( $SHAPE_COL - 1 ))
+}
+
+move_shape_down() {
+    SHAPE_ROW=$(( $SHAPE_ROW + 1 ))
+}
+
+move_shape_up() {
+    SHAPE_ROW=$(( $SHAPE_ROW - 1 ))
+}
+
+rotate_shape_right() {
+    SHAPE_ROTATION=$(( ($SHAPE_ROTATION + 1) % 4 ))
+    calc_shape_actual_size
+}
+
+rotate_shape_left() {
+    SHAPE_ROTATION=$(( $SHAPE_ROTATION - 1 ))
+    [ $SHAPE_ROTATION -lt 0 ] && SHAPE_ROTATION=$(( 4 + $SHAPE_ROTATION ))
+    calc_shape_actual_size
+}
+
 is_shape_down() {
-    [ $(( $SHAPE_ROW + $SHAPE_ACTUAL_HEIGHT )) -ge $STAGE_BOTTOM ]
+    [ $(( $SHAPE_ROW + $SHAPE_ACTUAL_HEIGHT )) -gt $STAGE_BOTTOM ]
 }
 
 is_shape_left() {
-    [ $SHAPE_COL -le $(( $STAGE_COL + 1 )) ]
+    [ $SHAPE_COL -le $STAGE_COL ]
 }
 
 is_shape_right() {
-    [ $(( $SHAPE_COL + $SHAPE_ACTUAL_WIDTH )) -ge $STAGE_RIGHT ]
+    [ $(( $SHAPE_COL + $SHAPE_ACTUAL_WIDTH )) -gt $STAGE_RIGHT ]
 }
 
 calc_shape_actual_size() {
@@ -76,16 +103,10 @@ render_stage() {
 
 on_action() {
     case $1 in
-        A)
-            SHAPE_ROTATION=$(( ($SHAPE_ROTATION + 1) % 4 ))
-            calc_shape_actual_size
-            is_shape_right && SHAPE_COL=$(( $STAGE_RIGHT - $SHAPE_ACTUAL_WIDTH))
-            is_shape_down && SHAPE_ROW=$(( $STAGE_BOTTOM - $SHAPE_ACTUAL_HEIGHT ))
-            render_shape
-            ;;
-        B) move_shape_down ;;
-        C) move_shape_right ;;
-        D) move_shape_left ;;
+        A) try_rotate_shape ;;
+        B) try_move_shape_down ;;
+        C) try_move_shape_right ;;
+        D) try_move_shape_left ;;
         '') drop_shape_down ;;
         q) exit ;;
         *) return 1 ;;
@@ -93,38 +114,42 @@ on_action() {
 }
 
 on_timeout() {
+    try_move_shape_down
+}
+
+try_rotate_shape() {
+    rotate_shape_right
+    (is_shape_right || is_shape_left || is_heap_hit) &&  rotate_shape_left || render_shape
+}
+
+try_move_shape_left() {
+    move_shape_left
+    (is_shape_left || is_heap_hit) && move_shape_right || render_shape
+}
+
+try_move_shape_right() {
+    move_shape_right
+    (is_shape_right || is_heap_hit) && move_shape_left || render_shape
+}
+
+try_move_shape_down() {
     move_shape_down
-}
-
-move_shape_left() {
-    (is_heap_hit 0 1 0 || is_shape_left) || {
-        SHAPE_COL=$(( $SHAPE_COL - 1 ))
-        render_shape
-    }
-}
-
-move_shape_right() {
-    (is_heap_hit 0 0 1 || is_shape_right) || {
-        SHAPE_COL=$(( $SHAPE_COL + 1 ))
-        render_shape
-    }
-}
-
-move_shape_down() {
-    (is_heap_hit || is_shape_down) && {
+    (is_shape_down || is_heap_hit) && {
+        move_shape_up
         update_heap
         render_heap
         next_shape
     } || {
-        SHAPE_ROW=$(( $SHAPE_ROW + 1 ))
         render_shape
     }
 }
 
 drop_shape_down() {
+    move_shape_down
     while (! is_shape_down && ! is_heap_hit); do
-        SHAPE_ROW=$(( $SHAPE_ROW + 1 ))
+        move_shape_down
     done
+    move_shape_up
     clear_shape
     update_heap
     render_heap
