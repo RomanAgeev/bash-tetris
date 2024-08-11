@@ -43,8 +43,9 @@ is_heap_hit() {
         eval "local heap=( \"\${HEAP_$heap_i[@]}\" )"
         local heap_height=${#heap[@]}
         local heap_top=$(( $STAGE_BOTTOM - $heap_height ))
+        [ $heap_top -lt $top ] && heap_top=$top
         for (( j=$heap_top; j<=$bottom; j++ )); do
-            local line_j=$(( $heap_top - $top ))
+            local line_j=$(( $j - $top ))
             local shape_line="${shape_lines[$line_j]}"
             [ "${shape_line:$i:1}" != "." ] && {
                 return 0
