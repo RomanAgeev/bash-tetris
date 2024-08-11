@@ -6,8 +6,16 @@ init_heap() {
     done
 }
 
-set_heap() {
+set_heap_item() {
     eval "HEAP_${1:?}[${2:?}]=\"\${3:?}\""
+}
+
+get_heap_item() {
+    eval "heap_item=\${HEAP_${1:?}[${2:?}]}"
+}
+
+get_heap_height() {
+    eval "heap_height=\${#HEAP_${1:?}[@]}"
 }
 
 render_heap() {
@@ -36,15 +44,15 @@ is_heap_hit() {
 
     for (( i=0; i<$SHAPE_ACTUAL_WIDTH; i++ )); do
         local heap_i=$(( $left - $STAGE_COL + $i - 1 ))
-        eval "local heap=( \"\${HEAP_$heap_i[@]}\" )"
-        local heap_height=${#heap[@]}
+        local heap_height; get_heap_height $heap_i
         local heap_top=$(( $STAGE_BOTTOM - $heap_height ))
         [ $heap_top -lt $top ] && heap_top=$top
         for (( j=$heap_top; j<=$bottom; j++ )); do
             local line_j=$(( $j - $top ))
             local heap_j=$(( $STAGE_BOTTOM - $j - 1 ))
             local shape_line="${shape_lines[$line_j]}"
-            ([ "${shape_line:$i:1}" != "." ] && [ ${heap[$heap_j]} -ne $TRANSPARENT ]) && return 0
+            local heap_item; get_heap_item $heap_i $heap_j
+            ([ "${shape_line:$i:1}" != "." ] && [ $heap_item -ne $TRANSPARENT ]) && return 0
         done
     done
     return 1
@@ -63,11 +71,11 @@ update_heap() {
             local color; [ "${shape_line:$i:1}" != "." ] && color="$SHAPE_COLOR" || color="$TRANSPARENT"
             local heap_i=$(( $SHAPE_COL - $STAGE_COL + $i - 1 ))
             local heap_j=$(( $STAGE_BOTTOM - $SHAPE_ROW - $j - 1 ))
-            eval "local heap_height=\${#HEAP_$heap_i[@]}"
+            local heap_height; get_heap_height $heap_i
             for (( k=$heap_j-1; k>=$heap_height; k-- )); do
-                set_heap $heap_i $k $TRANSPARENT
+                set_heap_item $heap_i $k $TRANSPARENT
             done
-            set_heap $heap_i $heap_j $color
+            set_heap_item $heap_i $heap_j $color
         done
     done
 }
