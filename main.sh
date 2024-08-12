@@ -17,8 +17,8 @@ FLOOR=_
 PLACEHOLDER=O
 STAGE_ROW=10
 STAGE_COL=60
-STAGE_WIDTH=50
-STAGE_HEIGHT=30
+STAGE_WIDTH=5
+STAGE_HEIGHT=15
 STAGE_BOTTOM=$(( $STAGE_ROW + $STAGE_HEIGHT ))
 STAGE_RIGHT=$(( $STAGE_COL + $STAGE_WIDTH ))
 STAGE_INNER=$(( $STAGE_WIDTH - 1 ))
@@ -114,7 +114,7 @@ on_action() {
 }
 
 on_timeout() {
-    try_move_shape_down
+    :; # try_move_shape_down
 }
 
 try_rotate_shape() {
@@ -137,6 +137,7 @@ try_move_shape_down() {
     (is_shape_down || is_heap_hit) && {
         move_shape_up
         update_heap
+        clear_heap
         render_heap
         next_shape
     } || {
@@ -152,6 +153,7 @@ drop_shape_down() {
     move_shape_up
     clear_shape
     update_heap
+    clear_heap
     render_heap
     next_shape
 }
