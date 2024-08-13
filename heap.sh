@@ -104,7 +104,7 @@ adjust_heap() {
     local row=
     for (( j=0; j<${#HEAP_WIDTH[@]}; j++ )); do
         [ ${HEAP_WIDTH[$j]} -eq $STAGE_INNER ] && {
-            : ${row:=$j}
+            row=$j
             break
         }
     done
