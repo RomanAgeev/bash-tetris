@@ -25,12 +25,12 @@ render_heap() {
 
     init_canvas
     for (( i=0; i<$STAGE_INNER; i++ )); do
-        eval "local height=\${#HEAP_$i[@]}"
-        for (( j=$row; j<$height; j++ )); do
-            eval "local color=\${HEAP_$i[$j]}"
-            [ $color -ne $TRANSPARENT ] && {
+        local heap_height; get_heap_height $i
+        for (( j=$row; j<$heap_height; j++ )); do
+            local heap_item; get_heap_item $i $j
+            [ $heap_item -ne $TRANSPARENT ] && {
                 set_canvas_cursor_at $(( $STAGE_BOTTOM - $j - 1 )) $(( $STAGE_COL + $i + 1 ))
-                set_canvas_foreground $color
+                set_canvas_foreground $heap_item
                 add_canvas_format "%s" "$placeholder"
             }
         done
