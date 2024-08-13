@@ -22,7 +22,8 @@ STAGE_HEIGHT=15
 STAGE_BOTTOM=$(( $STAGE_ROW + $STAGE_HEIGHT ))
 STAGE_RIGHT=$(( $STAGE_COL + $STAGE_WIDTH ))
 STAGE_INNER=$(( $STAGE_WIDTH - 1 ))
-SHAPES=("xx xx" "xx. .xx" "x.. xxx" "xxxx" "..x xxx" ".xx xx." ".x. xxx")
+# SHAPES=("xx xx" "xx. .xx" "x.. xxx" "xxxx" "..x xxx" ".xx xx." ".x. xxx")
+SHAPES=("x.. xxx" "..x xxx")
 COLORS=("$RED" "$GREEN" "$YELLOW" "$BLUE" "$MAGENTA" "$CYAN" "$WHITE")
 
 next_shape() {
@@ -137,8 +138,7 @@ try_move_shape_down() {
     (is_shape_down || is_heap_hit) && {
         move_shape_up
         update_heap
-        clear_heap
-        render_heap
+        adjust_heap
         next_shape
     } || {
         render_shape
@@ -153,21 +153,20 @@ drop_shape_down() {
     move_shape_up
     clear_shape
     update_heap
-    clear_heap
-    render_heap
+    adjust_heap
     next_shape
 }
 
 on_exit() {
-    clear
+    # clear
     show_cursor
 }
 
 trap "on_exit" EXIT
 
 clear
-set_foreground "$NEUTRAL"
-set_background "$NEUTRAL"
+# set_foreground "$NEUTRAL"
+# set_background "$NEUTRAL"
 hide_cursor
 render_stage
 init_heap

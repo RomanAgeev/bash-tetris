@@ -30,12 +30,6 @@ add_canvas_format() {
     _append_canvas_suffix "$format" "$@"
 }
 
-add_canvas_string() {
-    local string="${1:?}"
-
-    add_canvas_format "%s" "$string"
-}
-
 add_canvas_format_line() {
     local format="${1:?}"
 
@@ -53,8 +47,8 @@ add_canvas_string_line() {
 render_canvas() {
     printf "$CANVAS\n" "$@"
 
-    set_foreground "$NEUTRAL"
-    set_background "$NEUTRAL"
+    # set_foreground "$NEUTRAL"
+    # set_background "$NEUTRAL"
 }
 
 _append_canvas_suffix() {
