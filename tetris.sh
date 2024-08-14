@@ -97,14 +97,6 @@ append_canvas_suffix() {
     CANVAS="$CANVAS$suffix"
 }
 
-fill_array() {
-    local _array=()
-    while [ ${#_array[@]} -lt ${2:?} ]; do
-        _array+=( "${3:- }" )
-    done
-    eval "${1:?}=( \"\${_array[@]}\" )"
-}
-
 init_shape() {
     local string="${1:?}"
     local color="${2:?}"
@@ -138,11 +130,15 @@ init_shape() {
     SHAPE_COL=$col
     SHAPE_ROTATION=0
     SHAPE_COLOR="$color"
-    SHAPE_PLACEHOLDER="$placeholder"
-    local placeholders; fill_array placeholders "$SHAPE_LENGTH" "$SHAPE_PLACEHOLDER"
-    SHAPE_PLACEHOLDERS=("${placeholders[@]}")
-    local spaces; fill_array spaces "$SHAPE_LENGTH"
-    SHAPE_SPACES=("${spaces[@]}")
+
+    SHAPE_PLACEHOLDERS=()
+    while [ ${#SHAPE_PLACEHOLDERS[@]} -lt $SHAPE_LENGTH ]; do
+        SHAPE_PLACEHOLDERS+=( "$placeholder" )
+    done
+    SHAPE_SPACES=()
+    while [ ${#SHAPE_SPACES[@]} -lt $SHAPE_LENGTH ]; do
+        SHAPE_SPACES+=( " " )
+    done
 }
 
 render_shape() {
