@@ -17,13 +17,12 @@ FLOOR=_
 PLACEHOLDER=O
 STAGE_ROW=10
 STAGE_COL=60
-STAGE_WIDTH=5
+STAGE_WIDTH=20
 STAGE_HEIGHT=15
 STAGE_BOTTOM=$(( $STAGE_ROW + $STAGE_HEIGHT ))
 STAGE_RIGHT=$(( $STAGE_COL + $STAGE_WIDTH ))
 STAGE_INNER=$(( $STAGE_WIDTH - 1 ))
-# SHAPES=("xx xx" "xx. .xx" "x.. xxx" "xxxx" "..x xxx" ".xx xx." ".x. xxx")
-SHAPES=("x.. xxx" "..x xxx")
+SHAPES=("xx xx" "xx. .xx" "x.. xxx" "xxxx" "..x xxx" ".xx xx." ".x. xxx")
 COLORS=("$RED" "$GREEN" "$YELLOW" "$BLUE" "$MAGENTA" "$CYAN" "$WHITE")
 
 next_shape() {
@@ -115,7 +114,7 @@ on_action() {
 }
 
 on_timeout() {
-    :; # try_move_shape_down
+    try_move_shape_down
 }
 
 try_rotate_shape() {
@@ -158,15 +157,15 @@ drop_shape_down() {
 }
 
 on_exit() {
-    # clear
+    clear
     show_cursor
 }
 
 trap "on_exit" EXIT
 
 clear
-# set_foreground "$NEUTRAL"
-# set_background "$NEUTRAL"
+set_foreground "$NEUTRAL"
+set_background "$NEUTRAL"
 hide_cursor
 render_stage
 init_heap

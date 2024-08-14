@@ -47,8 +47,8 @@ add_canvas_string_line() {
 render_canvas() {
     printf "$CANVAS\n" "$@"
 
-    # set_foreground "$NEUTRAL"
-    # set_background "$NEUTRAL"
+    set_foreground "$NEUTRAL"
+    set_background "$NEUTRAL"
 }
 
 _append_canvas_suffix() {

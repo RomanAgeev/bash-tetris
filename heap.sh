@@ -15,6 +15,10 @@ get_heap_item() {
     eval "heap_item=\${HEAP_${1:?}[${2:?}]}"
 }
 
+has_heap_item() {
+    eval "[ -n \"\${HEAP_${1:?}[${2:?}]-}\" ]"
+}
+
 get_heap_height() {
     eval "heap_height=\${#HEAP_${1:?}[@]}"
 }
@@ -78,14 +82,14 @@ update_heap() {
         for (( ; j<$SHAPE_ACTUAL_HEIGHT; j++ )); do
             heap_j=$(( $STAGE_BOTTOM - $SHAPE_ROW - $j - 1 ))
             local shape_line="${shape_lines[$j]}"
-            [ "${shape_line:$i:1}" != "." ] && {
+            if [ "${shape_line:$i:1}" != "." ]; then
                 set_heap_item $heap_i $heap_j $SHAPE_COLOR
                 local heap_width=${HEAP_WIDTH[$heap_j]-0}
                 heap_width=$(( $heap_width + 1 ))
                 HEAP_WIDTH[$heap_j]=$heap_width
-            } || {
+            elif ! has_heap_item $heap_i $heap_j; then
                 set_heap_item $heap_i $heap_j $TRANSPARENT
-            }
+            fi
         done
 
         for (( k=$heap_j-1; k>=$heap_height; k-- )); do
@@ -95,12 +99,6 @@ update_heap() {
 }
 
 adjust_heap() {
-    for (( i=0; i<$STAGE_INNER; i++ )); do
-        eval "echo \"HEAP_${i}=( \"\${HEAP_$i[*]}\" )\""
-    done
-
-    return 0
-
     local row=
     for (( j=0; j<${#HEAP_WIDTH[@]}; j++ )); do
         [ ${HEAP_WIDTH[$j]} -eq $STAGE_INNER ] && {
