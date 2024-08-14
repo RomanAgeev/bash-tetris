@@ -137,7 +137,7 @@ try_move_shape_down() {
     (is_shape_down || is_heap_hit) && {
         move_shape_up
         update_heap
-        adjust_heap
+        shrink_heap_cascade
         next_shape
     } || {
         render_shape
@@ -152,7 +152,7 @@ drop_shape_down() {
     move_shape_up
     clear_shape
     update_heap
-    adjust_heap
+    shrink_heap_cascade
     next_shape
 }
 

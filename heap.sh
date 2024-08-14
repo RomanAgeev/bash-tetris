@@ -98,7 +98,7 @@ update_heap() {
     done
 }
 
-adjust_heap() {
+shrink_heap() {
     local row=
     for (( j=0; j<${#HEAP_WIDTH[@]}; j++ )); do
         [ ${HEAP_WIDTH[$j]} -eq $STAGE_INNER ] && {
@@ -109,7 +109,7 @@ adjust_heap() {
 
     [ -z "$row" ] && {
         render_heap 0 $PLACEHOLDER
-        return 0
+        return 1
     }
 
     render_heap $row
@@ -129,4 +129,10 @@ adjust_heap() {
     HEAP_WIDTH=( "${HEAP_WIDTH[@]}" )
 
     render_heap $row $PLACEHOLDER
+}
+
+shrink_heap_cascade() {
+    while shrink_heap; do
+        :
+    done
 }
