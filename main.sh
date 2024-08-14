@@ -12,9 +12,10 @@ source ./heap.sh
 require bc
 require gdate
 
-WALL="|"
-FLOOR=_
-PLACEHOLDER=O
+WALL_LEFT='\U258F'
+WALL_RIGHT='\U2595'
+FLOOR='\U2594'
+PLACEHOLDER='\U2586'
 STAGE_ROW=10
 STAGE_COL=60
 STAGE_WIDTH=20
@@ -84,17 +85,17 @@ calc_shape_actual_size() {
 
 render_stage() {
     local line;
-    printf -v line "$WALL%$STAGE_INNER.${STAGE_INNER}s$WALL" " "
+    printf -v line "$WALL_LEFT%$STAGE_INNER.${STAGE_INNER}s$WALL_RIGHT" " "
 
     init_canvas
     set_canvas_foreground $WHITE
     set_canvas_cursor_at $STAGE_ROW $STAGE_COL
-    for (( i = 0; i<$STAGE_HEIGHT - 1; i++ )); do
+    for (( i = 0; i<$STAGE_HEIGHT; i++ )); do
         add_canvas_format_line "$line"
     done
 
     local bottom_line;
-    printf -v bottom_line "$WALL%$STAGE_INNER.${STAGE_INNER}s$WALL" " "
+    printf -v bottom_line " %$STAGE_INNER.${STAGE_INNER}s " " "
     bottom_line="${bottom_line// /$FLOOR}"
     add_canvas_format_line "$bottom_line"
 

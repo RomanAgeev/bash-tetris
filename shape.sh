@@ -96,7 +96,7 @@ init_shape_format() {
 
             [ $full_length -gt 0 ] && {
                 local full="${line:0:$full_length}"
-                line_format="$line_format${full//[^.]/%s}"
+                line_format="$line_format${full//[^.]/%b}"
                 line_length=${#full_tail}
                 line="$full_tail"
             }
