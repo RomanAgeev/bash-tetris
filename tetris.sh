@@ -5,10 +5,8 @@ shopt -s extglob
 
 ESC=$'\e'
 CSI=$ESC[
-
 CUR_HIDE="${CSI}?25l"
 CUR_SHOW="${CSI}?25h"
-
 CUR_ROW_COL="${CSI}%d;%dH"
 CUR_SAVE="${CSI}s"
 CUR_RESTORE="${CSI}u"
@@ -29,15 +27,14 @@ BLUE=4
 MAGENTA=5
 CYAN=6
 WHITE=7
-NEUTRAL=$BLACK
 
-FG=3
-SET_FG="${CSI}${FG}%dm"
+FG="${CSI}3%dm"
 
 WALL_LEFT='\U258F'
 WALL_RIGHT='\U2595'
 FLOOR='\U2594'
 PLACEHOLDER='\U2586'
+
 STAGE_ROW=10
 STAGE_COL=60
 STAGE_WIDTH=20
@@ -45,6 +42,7 @@ STAGE_HEIGHT=15
 (( STAGE_BOTTOM = STAGE_ROW + STAGE_HEIGHT ))
 (( STAGE_RIGHT = STAGE_COL + STAGE_WIDTH ))
 (( STAGE_INNER = STAGE_WIDTH - 1 ))
+
 SHAPES=("xx xx" "xx. .xx" "x.. xxx" "xxxx" "..x xxx" ".xx xx." ".x. xxx")
 COLORS=("$RED" "$GREEN" "$YELLOW" "$BLUE" "$MAGENTA" "$CYAN" "$WHITE")
 
@@ -56,8 +54,8 @@ show_cursor() {
     printf "$CUR_SHOW"
 }
 
-set_foreground() {
-    printf "$SET_FG" "${1:?}"
+reset_fg() {
+    printf "$FG" "$BLACK"
 }
 
 init_canvas() {
@@ -65,7 +63,7 @@ init_canvas() {
 }
 
 set_canvas_foreground() {
-    local suffix; printf -v suffix "$SET_FG" "${1:?}"
+    local suffix; printf -v suffix "$FG" "${1:?}"
     append_canvas_suffix "$suffix"
 }
 
@@ -87,7 +85,7 @@ add_canvas_format_line() {
 
 render_canvas() {
     printf "$CANVAS\n" "$@"
-    set_foreground "$NEUTRAL"
+    reset_fg
 }
 
 append_canvas_suffix() {
@@ -516,10 +514,6 @@ drop_shape_down() {
     next_shape
 }
 
-get_timestamp_ms() {
-    eval "${1:?}=\$( gdate +%s%3N )"
-}
-
 to_seconds() {
     eval "${2:?}=\$( bc <<< \"scale=3; ${1:?} / 1000\" )"
 }
@@ -532,14 +526,14 @@ loop() {
     local timeout_ms="$initial_timeout_ms"
 
     while :; do
-        local before_ms; get_timestamp_ms before_ms
+        local before_ms=$( gdate +%s%3N )
         local _timeout; to_seconds "$timeout_ms" _timeout
 
         while :; do
             read -sn 1 -t "$_timeout" key || {
                 "$on_timeout"
                 timeout_ms="$initial_timeout_ms"
-                get_timestamp_ms before_ms
+                before_ms=$( gdate +%s%3N )
                 to_seconds "$timeout_ms" _timeout
                 continue
             }
@@ -547,7 +541,7 @@ loop() {
             "$on_action" "$key" && break
         done
 
-        local after_ms; get_timestamp_ms after_ms
+        local after_ms=$( gdate +%s%3N )
         (( timeout_ms = timeout_ms - after_ms + before_ms ))
     done
 }
@@ -560,10 +554,10 @@ on_exit() {
 trap "on_exit" EXIT
 
 clear
-set_foreground "$NEUTRAL"
+reset_fg
 hide_cursor
 render_stage
 init_heap
 next_shape
 
-loop on_action on_timeout 300
+loop on_action on_timeout 500
