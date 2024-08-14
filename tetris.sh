@@ -42,9 +42,9 @@ STAGE_ROW=10
 STAGE_COL=60
 STAGE_WIDTH=20
 STAGE_HEIGHT=15
-STAGE_BOTTOM=$(( $STAGE_ROW + $STAGE_HEIGHT ))
-STAGE_RIGHT=$(( $STAGE_COL + $STAGE_WIDTH ))
-STAGE_INNER=$(( $STAGE_WIDTH - 1 ))
+(( STAGE_BOTTOM = STAGE_ROW + STAGE_HEIGHT ))
+(( STAGE_RIGHT = STAGE_COL + STAGE_WIDTH ))
+(( STAGE_INNER = STAGE_WIDTH - 1 ))
 SHAPES=("xx xx" "xx. .xx" "x.. xxx" "xxxx" "..x xxx" ".xx xx." ".x. xxx")
 COLORS=("$RED" "$GREEN" "$YELLOW" "$BLUE" "$MAGENTA" "$CYAN" "$WHITE")
 
@@ -118,7 +118,7 @@ init_shape() {
     done
 
     SHAPE_HEIGHT="${#lines[@]}"
-    SHAPE_LENGTH=$(( $SHAPE_WIDTH * $SHAPE_HEIGHT ))
+    ((SHAPE_LENGTH = SHAPE_WIDTH * SHAPE_HEIGHT ))
 
     init_shape_format 0 "${lines[@]}"
     init_shape_format 1 "${lines[@]}"
@@ -179,7 +179,7 @@ init_shape_format() {
         local line_length=""${#line}
         while [ $line_length -gt 0 ]; do
             local empty_tail="${line#+(.)}"
-            local empty_length=$(( $line_length - ${#empty_tail} ))
+            local empty_length; (( empty_length = line_length - ${#empty_tail} ))
 
             [ $empty_length -gt 0 ] && {
                 local empty;
@@ -190,7 +190,7 @@ init_shape_format() {
             }
 
             local full_tail="${line#+([^.])}"
-            local full_length=$(( $line_length - ${#full_tail} ))
+            local full_length; (( full_length = line_length - ${#full_tail} ))
 
             [ $full_length -gt 0 ] && {
                 local full="${line:0:$full_length}"
@@ -281,7 +281,7 @@ render_heap() {
         for (( j=$row; j<$heap_height; j++ )); do
             local heap_item; get_heap_item $i $j
             [ $heap_item -ne $TRANSPARENT ] && {
-                set_canvas_cursor_at $(( $STAGE_BOTTOM - $j - 1 )) $(( $STAGE_COL + $i + 1 ))
+                set_canvas_cursor_at $(( STAGE_BOTTOM - j - 1 )) $(( STAGE_COL + i + 1 ))
                 set_canvas_foreground $heap_item
                 add_canvas_format "%s" "$placeholder"
             }
@@ -293,19 +293,19 @@ render_heap() {
 is_heap_hit() {
     local left=$SHAPE_COL
     local top=$SHAPE_ROW
-    local right=$(( $left + $SHAPE_ACTUAL_WIDTH - 1 ))
-    local bottom=$(( $top + $SHAPE_ACTUAL_HEIGHT - 1 ))
+    local right; (( right = left + SHAPE_ACTUAL_WIDTH - 1 ))
+    local bottom; (( bottom = top + SHAPE_ACTUAL_HEIGHT - 1 ))
 
     eval "local shape_lines=( \"\${SHAPE_LINES_$SHAPE_ROTATION[@]}\" )"
 
     for (( i=0; i<$SHAPE_ACTUAL_WIDTH; i++ )); do
-        local heap_i=$(( $left - $STAGE_COL + $i - 1 ))
+        local heap_i; (( heap_i = left - STAGE_COL + i - 1 ))
         local heap_height; get_heap_height $heap_i
-        local heap_top=$(( $STAGE_BOTTOM - $heap_height ))
+        local heap_top; (( heap_top = STAGE_BOTTOM - heap_height ))
         [ $heap_top -lt $top ] && heap_top=$top
         for (( j=$heap_top; j<=$bottom; j++ )); do
-            local line_j=$(( $j - $top ))
-            local heap_j=$(( $STAGE_BOTTOM - $j - 1 ))
+            local line_j; (( line_j = j - top ))
+            local heap_j; (( heap_j = STAGE_BOTTOM - j - 1 ))
             local shape_line="${shape_lines[$line_j]}"
             local heap_item; get_heap_item $heap_i $heap_j
             ([ "${shape_line:$i:1}" != "." ] && [ $heap_item -ne $TRANSPARENT ]) && return 0
@@ -317,7 +317,7 @@ is_heap_hit() {
 update_heap() {
     eval "local shape_lines=( \"\${SHAPE_LINES_$SHAPE_ROTATION[@]}\" )"
     for (( i=0; i<$SHAPE_ACTUAL_WIDTH; i++ )); do
-        local heap_i=$(( $SHAPE_COL - $STAGE_COL + $i - 1 ))
+        local heap_i; (( heap_i = SHAPE_COL - STAGE_COL + i - 1 ))
         local heap_height; get_heap_height $heap_i
 
         local j=0
@@ -328,12 +328,12 @@ update_heap() {
 
         local heap_j
         for (( ; j<$SHAPE_ACTUAL_HEIGHT; j++ )); do
-            heap_j=$(( $STAGE_BOTTOM - $SHAPE_ROW - $j - 1 ))
+            (( heap_j = STAGE_BOTTOM - SHAPE_ROW - j - 1 ))
             local shape_line="${shape_lines[$j]}"
             if [ "${shape_line:$i:1}" != "." ]; then
                 set_heap_item $heap_i $heap_j $SHAPE_COLOR
                 local heap_width=${HEAP_WIDTH[$heap_j]-0}
-                heap_width=$(( $heap_width + 1 ))
+                (( heap_width = heap_width + 1 ))
                 HEAP_WIDTH[$heap_j]=$heap_width
             elif ! has_heap_item $heap_i $heap_j; then
                 set_heap_item $heap_i $heap_j $TRANSPARENT
@@ -362,7 +362,7 @@ shrink_heap() {
 
     render_heap $row
 
-    for (( j=$(( ${#HEAP_WIDTH[@]} - 1)); j>=$row; j-- )); do
+    for (( (( j = ${#HEAP_WIDTH[@]} - 1)); j>=$row; j-- )); do
         [ ${HEAP_WIDTH[$j]} -eq $STAGE_INNER ] && {
             unset HEAP_WIDTH[$j]
             for (( i=0; i<$STAGE_INNER; i++ )); do
@@ -386,42 +386,42 @@ shrink_heap_cascade() {
 }
 
 next_shape() {
-    local shape_index=$(( $RANDOM % ${#SHAPES[@]} ))
-    local color_index=$(( $RANDOM % ${#COLORS[@]} ))
-    init_shape "${SHAPES[$shape_index]}" "${COLORS[$color_index]}" $STAGE_ROW $(( $STAGE_COL + $STAGE_WIDTH / 2 - 1 )) "$PLACEHOLDER"
+    local shape_index; (( shape_index = RANDOM % ${#SHAPES[@]} ))
+    local color_index; (( color_index = RANDOM % ${#COLORS[@]} ))
+    init_shape "${SHAPES[$shape_index]}" "${COLORS[$color_index]}" $STAGE_ROW $(( STAGE_COL + STAGE_WIDTH / 2 - 1 )) "$PLACEHOLDER"
     calc_shape_actual_size
     render_shape
 }
 
 move_shape_right() {
-    SHAPE_COL=$(( $SHAPE_COL + 1 ))
+    (( SHAPE_COL = SHAPE_COL + 1 ))
 }
 
 move_shape_left() {
-    SHAPE_COL=$(( $SHAPE_COL - 1 ))
+    (( SHAPE_COL = SHAPE_COL - 1 ))
 }
 
 move_shape_down() {
-    SHAPE_ROW=$(( $SHAPE_ROW + 1 ))
+    (( SHAPE_ROW = SHAPE_ROW + 1 ))
 }
 
 move_shape_up() {
-    SHAPE_ROW=$(( $SHAPE_ROW - 1 ))
+    (( SHAPE_ROW = SHAPE_ROW - 1 ))
 }
 
 rotate_shape_right() {
-    SHAPE_ROTATION=$(( ($SHAPE_ROTATION + 1) % 4 ))
+    (( SHAPE_ROTATION = ($SHAPE_ROTATION + 1) % 4 ))
     calc_shape_actual_size
 }
 
 rotate_shape_left() {
-    SHAPE_ROTATION=$(( $SHAPE_ROTATION - 1 ))
-    [ $SHAPE_ROTATION -lt 0 ] && SHAPE_ROTATION=$(( 4 + $SHAPE_ROTATION ))
+    (( SHAPE_ROTATION = SHAPE_ROTATION - 1 ))
+    [ $SHAPE_ROTATION -lt 0 ] && (( SHAPE_ROTATION = 4 + SHAPE_ROTATION ))
     calc_shape_actual_size
 }
 
 is_shape_down() {
-    [ $(( $SHAPE_ROW + $SHAPE_ACTUAL_HEIGHT )) -gt $STAGE_BOTTOM ]
+    [ $(( SHAPE_ROW + SHAPE_ACTUAL_HEIGHT )) -gt $STAGE_BOTTOM ]
 }
 
 is_shape_left() {
@@ -429,11 +429,11 @@ is_shape_left() {
 }
 
 is_shape_right() {
-    [ $(( $SHAPE_COL + $SHAPE_ACTUAL_WIDTH )) -gt $STAGE_RIGHT ]
+    [ $(( SHAPE_COL + SHAPE_ACTUAL_WIDTH )) -gt $STAGE_RIGHT ]
 }
 
 calc_shape_actual_size() {
-    [ $(( $SHAPE_ROTATION % 2 )) -eq 0 ] && {
+    [ $(( SHAPE_ROTATION % 2 )) -eq 0 ] && {
         SHAPE_ACTUAL_WIDTH=$SHAPE_WIDTH
         SHAPE_ACTUAL_HEIGHT=$SHAPE_HEIGHT
     } || {
@@ -548,7 +548,7 @@ loop() {
         done
 
         local after_ms; get_timestamp_ms after_ms
-        timeout_ms=$(( $timeout_ms - $after_ms + $before_ms ))
+        (( timeout_ms = timeout_ms - after_ms + before_ms ))
     done
 }
 
