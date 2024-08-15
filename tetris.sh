@@ -65,7 +65,7 @@ reset_fg() {
     printf "$FG" "$BLACK"
 }
 
-init_canvas() {
+new_canvas() {
     CANVAS=
 }
 
@@ -102,7 +102,7 @@ append_canvas_suffix() {
     CANVAS="$CANVAS$suffix"
 }
 
-init_shape() {
+new_shape() {
     local string="${1:?}"
     local color="${2:?}"
     local row="${3:?}"
@@ -149,7 +149,7 @@ render_shape() {
 
     eval "local format=( \"\${SHAPE_FORMAT_$SHAPE_ROTATION[@]}\" )"
 
-    init_canvas
+    new_canvas
     set_canvas_foreground "$SHAPE_COLOR"
     set_canvas_cursor_at "$SHAPE_ROW" "$SHAPE_COL"
     for line in "${format[@]}"; do
@@ -271,7 +271,7 @@ render_heap() {
     local from=${1:?}
     local to=${2:?}
 
-    init_canvas
+    new_canvas
     for (( i=0; i<$STAGE_WIDTH; i++ )); do
         for (( j=$from; j<=$to; j++ )); do
             local heap_item; get_heap_item $i $j
@@ -377,7 +377,7 @@ shrink_heap_cascade() {
 next_shape() {
     local shape_index; (( shape_index = RANDOM % ${#SHAPES[@]} ))
     local color_index; (( color_index = RANDOM % ${#COLORS[@]} ))
-    init_shape "${SHAPES[$shape_index]}" "${COLORS[$color_index]}" $STAGE_TOP $(( STAGE_LEFT + STAGE_WIDTH / 2 )) "$PLACEHOLDER"
+    new_shape "${SHAPES[$shape_index]}" "${COLORS[$color_index]}" $STAGE_TOP $(( STAGE_LEFT + STAGE_WIDTH / 2 )) "$PLACEHOLDER"
     calc_shape_actual_size
     render_shape
 }
@@ -435,7 +435,7 @@ render_stage() {
     local line;
     printf -v line "$WALL_LEFT%$STAGE_WIDTH.${STAGE_WIDTH}s$WALL_RIGHT" " "
 
-    init_canvas
+    new_canvas
     set_canvas_foreground $WHITE
     set_canvas_cursor_at $STAGE_TOP $STAGE_LEFT
     for (( i = 0; i<$STAGE_HEIGHT; i++ )); do
