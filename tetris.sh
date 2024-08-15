@@ -132,11 +132,9 @@ init_shape() {
     SHAPE_COLOR="$color"
 
     SHAPE_PLACEHOLDERS=()
-    while [ ${#SHAPE_PLACEHOLDERS[@]} -lt $SHAPE_LENGTH ]; do
-        SHAPE_PLACEHOLDERS+=( "$placeholder" )
-    done
     SHAPE_SPACES=()
-    while [ ${#SHAPE_SPACES[@]} -lt $SHAPE_LENGTH ]; do
+    for (( i=0; i<$SHAPE_LENGTH; i++ )); do
+        SHAPE_PLACEHOLDERS+=( "$placeholder" )
         SHAPE_SPACES+=( " " )
     done
 }
