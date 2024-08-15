@@ -35,13 +35,15 @@ WALL_RIGHT='\U2595'
 FLOOR='\U2594'
 PLACEHOLDER='\U2586'
 
-STAGE_ROW=10
-STAGE_COL=60
-STAGE_WIDTH=20
-STAGE_HEIGHT=15
-(( STAGE_BOTTOM = STAGE_ROW + STAGE_HEIGHT ))
-(( STAGE_RIGHT = STAGE_COL + STAGE_WIDTH ))
-(( STAGE_INNER = STAGE_WIDTH - 1 ))
+STAGE_WIDTH=${1:-20}
+STAGE_HEIGHT=${2:-15}
+
+shopt -s checkwinsize; (:);
+
+(( STAGE_LEFT = COLUMNS / 2 - STAGE_WIDTH / 2 ))
+(( STAGE_TOP = LINES / 2 - STAGE_HEIGHT / 2 ))
+(( STAGE_RIGHT = STAGE_LEFT + STAGE_WIDTH + 1 ))
+(( STAGE_BOTTOM = STAGE_TOP + STAGE_HEIGHT ))
 
 SHAPES=("xx xx" "xx. .xx" "x.. xxx" "xxxx" "..x xxx" ".xx xx." ".x. xxx")
 COLORS=("$RED" "$GREEN" "$YELLOW" "$BLUE" "$MAGENTA" "$CYAN" "$WHITE")
@@ -174,7 +176,7 @@ init_shape_format() {
     local format=()
     for line in "${lines[@]}"; do
         local line_format=
-        local line_length=""${#line}
+        local line_length=${#line}
         while [ $line_length -gt 0 ]; do
             local empty_tail="${line#+(.)}"
             local empty_length; (( empty_length = line_length - ${#empty_tail} ))
@@ -248,7 +250,7 @@ init_shape_lines_3() {
 
 init_heap() {
     HEAP_WIDTH=()
-    for (( i=0; i<$STAGE_INNER; i++ )); do
+    for (( i=0; i<$STAGE_WIDTH; i++ )); do
         eval "HEAP_$i=()"
     done
 }
@@ -274,11 +276,11 @@ render_heap() {
     local to=${2:?}
 
     init_canvas
-    for (( i=0; i<$STAGE_INNER; i++ )); do
+    for (( i=0; i<$STAGE_WIDTH; i++ )); do
         for (( j=$from; j<=$to; j++ )); do
             local heap_item; get_heap_item $i $j
             local placeholder; [ $heap_item -ne $TRANSPARENT ] && placeholder="$PLACEHOLDER" || placeholder=" "
-            set_canvas_cursor_at $(( STAGE_BOTTOM - j - 1 )) $(( STAGE_COL + i + 1 ))
+            set_canvas_cursor_at $(( STAGE_BOTTOM - j - 1 )) $(( STAGE_LEFT + i + 1 ))
             set_canvas_foreground $heap_item
             add_canvas_format "%s" "$placeholder"
         done
@@ -295,7 +297,7 @@ is_heap_hit() {
     eval "local shape_lines=( \"\${SHAPE_LINES_$SHAPE_ROTATION[@]}\" )"
 
     for (( i=0; i<$SHAPE_ACTUAL_WIDTH; i++ )); do
-        local heap_i; (( heap_i = left - STAGE_COL + i - 1 ))
+        local heap_i; (( heap_i = left - STAGE_LEFT + i - 1 ))
         local heap_height; get_heap_height $heap_i
         local heap_top; (( heap_top = STAGE_BOTTOM - heap_height ))
         [ $heap_top -lt $top ] && heap_top=$top
@@ -313,7 +315,7 @@ is_heap_hit() {
 update_heap() {
     eval "local shape_lines=( \"\${SHAPE_LINES_$SHAPE_ROTATION[@]}\" )"
     for (( i=0; i<$SHAPE_ACTUAL_WIDTH; i++ )); do
-        local heap_i; (( heap_i = SHAPE_COL - STAGE_COL + i - 1 ))
+        local heap_i; (( heap_i = SHAPE_COL - STAGE_LEFT + i - 1 ))
         local heap_height; get_heap_height $heap_i
 
         local j=0
@@ -345,7 +347,7 @@ update_heap() {
 shrink_heap() {
     local row=
     for (( j=0; j<${#HEAP_WIDTH[@]}; j++ )); do
-        [ ${HEAP_WIDTH[$j]} -eq $STAGE_INNER ] && {
+        [ ${HEAP_WIDTH[$j]} -eq $STAGE_WIDTH ] && {
             row=$j
             break
         }
@@ -354,15 +356,15 @@ shrink_heap() {
     [ -z "$row" ] && return 1
 
     for (( (( j = ${#HEAP_WIDTH[@]} - 1)); j>=$row; j-- )); do
-        [ ${HEAP_WIDTH[$j]} -eq $STAGE_INNER ] && {
+        [ ${HEAP_WIDTH[$j]} -eq $STAGE_WIDTH ] && {
             unset HEAP_WIDTH[$j]
-            for (( i=0; i<$STAGE_INNER; i++ )); do
+            for (( i=0; i<$STAGE_WIDTH; i++ )); do
                 eval "unset HEAP_$i[$j]"
             done
         }
     done
 
-    for (( i=0; i<$STAGE_INNER; i++ )); do
+    for (( i=0; i<$STAGE_WIDTH; i++ )); do
         eval "HEAP_$i=( \"\${HEAP_$i[@]}\" )"
     done
     HEAP_WIDTH=( "${HEAP_WIDTH[@]}" )
@@ -379,7 +381,7 @@ shrink_heap_cascade() {
 next_shape() {
     local shape_index; (( shape_index = RANDOM % ${#SHAPES[@]} ))
     local color_index; (( color_index = RANDOM % ${#COLORS[@]} ))
-    init_shape "${SHAPES[$shape_index]}" "${COLORS[$color_index]}" $STAGE_ROW $(( STAGE_COL + STAGE_WIDTH / 2 - 1 )) "$PLACEHOLDER"
+    init_shape "${SHAPES[$shape_index]}" "${COLORS[$color_index]}" $STAGE_TOP $(( STAGE_LEFT + STAGE_WIDTH / 2 )) "$PLACEHOLDER"
     calc_shape_actual_size
     render_shape
 }
@@ -416,7 +418,7 @@ is_shape_down() {
 }
 
 is_shape_left() {
-    [ $SHAPE_COL -le $STAGE_COL ]
+    [ $SHAPE_COL -le $STAGE_LEFT ]
 }
 
 is_shape_right() {
@@ -435,17 +437,17 @@ calc_shape_actual_size() {
 
 render_stage() {
     local line;
-    printf -v line "$WALL_LEFT%$STAGE_INNER.${STAGE_INNER}s$WALL_RIGHT" " "
+    printf -v line "$WALL_LEFT%$STAGE_WIDTH.${STAGE_WIDTH}s$WALL_RIGHT" " "
 
     init_canvas
     set_canvas_foreground $WHITE
-    set_canvas_cursor_at $STAGE_ROW $STAGE_COL
+    set_canvas_cursor_at $STAGE_TOP $STAGE_LEFT
     for (( i = 0; i<$STAGE_HEIGHT; i++ )); do
         add_canvas_format_line "$line"
     done
 
     local bottom_line;
-    printf -v bottom_line " %$STAGE_INNER.${STAGE_INNER}s " " "
+    printf -v bottom_line " %$STAGE_WIDTH.${STAGE_WIDTH}s " " "
     bottom_line="${bottom_line// /$FLOOR}"
     add_canvas_format_line "$bottom_line"
 
