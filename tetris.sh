@@ -48,6 +48,11 @@ shopt -s checkwinsize; (:);
 IFS_BAK=$IFS; IFS=$'\n'; SHAPES=( $(< ${1:-./shapes/tetramino.cfg}) ); IFS=$IFS_BAK
 COLORS=("$RED" "$GREEN" "$YELLOW" "$BLUE" "$MAGENTA" "$CYAN" "$WHITE")
 
+HEAP_WIDTH=()
+for (( i=0; i<$STAGE_WIDTH; i++ )); do
+    eval "HEAP_$i=()"
+done
+
 hide_cursor() {
     printf "$CUR_HIDE"
 }
@@ -243,13 +248,6 @@ init_shape_lines_3() {
             line=$line"${lines[$j]:$i:1}"
         done
         SHAPE_LINES_3+=( "$line" )
-    done
-}
-
-init_heap() {
-    HEAP_WIDTH=()
-    for (( i=0; i<$STAGE_WIDTH; i++ )); do
-        eval "HEAP_$i=()"
     done
 }
 
@@ -550,7 +548,6 @@ clear
 reset_fg
 hide_cursor
 render_stage
-init_heap
 next_shape
 
 loop on_action on_timeout 500
