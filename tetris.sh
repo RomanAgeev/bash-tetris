@@ -368,9 +368,7 @@ shrink_heap() {
 
 shrink_heap_cascade() {
     local heap_height=${#HEAP_WIDTH[@]}
-    while shrink_heap; do
-        :
-    done
+    while shrink_heap; do (:); done
     render_heap 0 $(( heap_height - 1 ))
 }
 
