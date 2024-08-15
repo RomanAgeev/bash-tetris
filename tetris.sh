@@ -35,8 +35,8 @@ WALL_RIGHT='\U2595'
 FLOOR='\U2594'
 PLACEHOLDER='\U2586'
 
-STAGE_WIDTH=${1:-20}
-STAGE_HEIGHT=${2:-15}
+STAGE_WIDTH=20
+STAGE_HEIGHT=15
 
 shopt -s checkwinsize; (:);
 
@@ -45,7 +45,7 @@ shopt -s checkwinsize; (:);
 (( STAGE_RIGHT = STAGE_LEFT + STAGE_WIDTH + 1 ))
 (( STAGE_BOTTOM = STAGE_TOP + STAGE_HEIGHT ))
 
-SHAPES=("xx xx" "xx. .xx" "x.. xxx" "xxxx" "..x xxx" ".xx xx." ".x. xxx")
+IFS_BAK=$IFS; IFS=$'\n'; SHAPES=( $(< ${1:-./shapes/tetramino.cfg}) ); IFS=$IFS_BAK
 COLORS=("$RED" "$GREEN" "$YELLOW" "$BLUE" "$MAGENTA" "$CYAN" "$WHITE")
 
 hide_cursor() {
