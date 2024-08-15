@@ -258,7 +258,7 @@ set_heap_item() {
 }
 
 get_heap_item() {
-    eval "heap_item=\${HEAP_${1:?}[${2:?}]}"
+    eval "heap_item=\${HEAP_${1:?}[${2:?}]-$TRANSPARENT}"
 }
 
 has_heap_item() {
@@ -270,19 +270,17 @@ get_heap_height() {
 }
 
 render_heap() {
-    local row=${1:-0}
-    local placeholder="${2:- }"
+    local from=${1:?}
+    local to=${2:?}
 
     init_canvas
     for (( i=0; i<$STAGE_INNER; i++ )); do
-        local heap_height; get_heap_height $i
-        for (( j=$row; j<$heap_height; j++ )); do
+        for (( j=$from; j<=$to; j++ )); do
             local heap_item; get_heap_item $i $j
-            [ $heap_item -ne $TRANSPARENT ] && {
-                set_canvas_cursor_at $(( STAGE_BOTTOM - j - 1 )) $(( STAGE_COL + i + 1 ))
-                set_canvas_foreground $heap_item
-                add_canvas_format "%s" "$placeholder"
-            }
+            local placeholder; [ $heap_item -ne $TRANSPARENT ] && placeholder="$PLACEHOLDER" || placeholder=" "
+            set_canvas_cursor_at $(( STAGE_BOTTOM - j - 1 )) $(( STAGE_COL + i + 1 ))
+            set_canvas_foreground $heap_item
+            add_canvas_format "%s" "$placeholder"
         done
     done
     render_canvas
@@ -353,12 +351,7 @@ shrink_heap() {
         }
     done
 
-    [ -z "$row" ] && {
-        render_heap 0 $PLACEHOLDER
-        return 1
-    }
-
-    render_heap $row
+    [ -z "$row" ] && return 1
 
     for (( (( j = ${#HEAP_WIDTH[@]} - 1)); j>=$row; j-- )); do
         [ ${HEAP_WIDTH[$j]} -eq $STAGE_INNER ] && {
@@ -373,14 +366,14 @@ shrink_heap() {
         eval "HEAP_$i=( \"\${HEAP_$i[@]}\" )"
     done
     HEAP_WIDTH=( "${HEAP_WIDTH[@]}" )
-
-    render_heap $row $PLACEHOLDER
 }
 
 shrink_heap_cascade() {
+    local heap_height=${#HEAP_WIDTH[@]}
     while shrink_heap; do
         :
     done
+    render_heap 0 $(( heap_height - 1 ))
 }
 
 next_shape() {
