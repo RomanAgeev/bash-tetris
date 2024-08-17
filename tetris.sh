@@ -343,8 +343,10 @@ update_heap() {
 }
 
 shrink_heap() {
+    calc_heap_height
+
     local row=
-    for (( j=0; j<${#HEAP_WIDTH[@]}; j++ )); do
+    for (( j=0; j<HEAP_HEIGHT; j++ )); do
         [ ${HEAP_WIDTH[$j]} -eq $STAGE_WIDTH ] && {
             row=$j
             break
@@ -353,7 +355,7 @@ shrink_heap() {
 
     [ -z "$row" ] && return 1
 
-    for (( (( j = ${#HEAP_WIDTH[@]} - 1)); j>=$row; j-- )); do
+    for (( (( j = HEAP_HEIGHT - 1)); j>=$row; j-- )); do
         [ ${HEAP_WIDTH[$j]} -eq $STAGE_WIDTH ] && {
             unset HEAP_WIDTH[$j]
             for (( i=0; i<$STAGE_WIDTH; i++ )); do
@@ -369,9 +371,10 @@ shrink_heap() {
 }
 
 shrink_heap_cascade() {
-    local heap_height=${#HEAP_WIDTH[@]}
+    calc_heap_height
+    local heap_height_before=$HEAP_HEIGHT
     while shrink_heap; do (:); done
-    render_heap 0 $(( heap_height - 1 ))
+    render_heap 0 $(( heap_height_before - 1 ))
 }
 
 next_shape() {
