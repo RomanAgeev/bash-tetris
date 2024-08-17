@@ -49,7 +49,7 @@ IFS_BAK=$IFS; IFS=$'\n'; SHAPES=( $(< ${1:-./shapes/tetramino.cfg}) ); IFS=$IFS_
 COLORS=("$RED" "$GREEN" "$YELLOW" "$BLUE" "$MAGENTA" "$CYAN" "$WHITE")
 
 HEAP_WIDTH=()
-for (( i=0; i<$STAGE_WIDTH; i++ )); do
+for (( i = 0; i < STAGE_WIDTH; i++ )); do
     eval "HEAP_$i=()"
 done
 
@@ -100,7 +100,7 @@ render_canvas() {
 append_canvas_suffix() {
     local format="${1:?}"
     shift 1
-    local suffix; [ $# -gt 0 ] && printf -v suffix "$format" "$@" || suffix="$format"
+    local suffix; (( $# > 0 )) && printf -v suffix "$format" "$@" || suffix="$format"
     CANVAS="$CANVAS$suffix"
 }
 
@@ -140,7 +140,7 @@ new_shape() {
 
     SHAPE_PLACEHOLDERS=()
     SHAPE_SPACES=()
-    for (( i=0; i<$SHAPE_LENGTH; i++ )); do
+    for (( i = 0; i < SHAPE_LENGTH; i++ )); do
         SHAPE_PLACEHOLDERS+=( "$placeholder" )
         SHAPE_SPACES+=( " " )
     done
@@ -182,11 +182,11 @@ init_shape_format() {
     for line in "${lines[@]}"; do
         local line_format=
         local line_length=${#line}
-        while [ $line_length -gt 0 ]; do
+        while (( line_length > 0 )); do
             local empty_tail="${line#+(.)}"
             local empty_length; (( empty_length = line_length - ${#empty_tail} ))
 
-            [ $empty_length -gt 0 ] && {
+            (( empty_length > 0 )) && {
                 local empty;
                 printf -v empty "$CUR_RIGHT_N" "$empty_length"
                 line_format="$line_format$empty"
@@ -197,7 +197,7 @@ init_shape_format() {
             local full_tail="${line#+([^.])}"
             local full_length; (( full_length = line_length - ${#full_tail} ))
 
-            [ $full_length -gt 0 ] && {
+            (( full_length > 0 )) && {
                 local full="${line:0:$full_length}"
                 line_format="$line_format${full//[^.]/%b}"
                 line_length=${#full_tail}
@@ -218,9 +218,9 @@ init_shape_lines_1() {
     local lines=( $@ )
 
     SHAPE_LINES_1=()
-    for (( i=0; i<$SHAPE_WIDTH; i++ )); do
+    for (( i = 0; i < SHAPE_WIDTH; i++ )); do
         local line=""
-        for (( j=$SHAPE_HEIGHT-1; j>=0; j-- )); do
+        for (( j = SHAPE_HEIGHT-1; j >= 0; j-- )); do
             line=$line"${lines[$j]:$i:1}"
         done
         SHAPE_LINES_1+=( "$line" )
@@ -231,9 +231,9 @@ init_shape_lines_2() {
     local lines=( $@ )
 
     SHAPE_LINES_2=()
-    for (( j=$SHAPE_HEIGHT-1; j>=0; j-- )); do
+    for (( j = SHAPE_HEIGHT - 1; j >= 0; j-- )); do
         local line=""
-        for (( i=$SHAPE_WIDTH-1; i>=0; i-- )); do
+        for (( i = SHAPE_WIDTH - 1; i >= 0; i-- )); do
             line=$line"${lines[$j]:$i:1}"
         done
         SHAPE_LINES_2+=( "$line" )
@@ -244,9 +244,9 @@ init_shape_lines_3() {
     local lines=( $@ )
 
     SHAPE_LINES_3=()
-    for (( i=$SHAPE_WIDTH-1; i>=0; i-- )); do
+    for (( i = SHAPE_WIDTH - 1; i >= 0; i-- )); do
         local line=""
-        for (( j=0; j<$SHAPE_HEIGHT;j++ )); do
+        for (( j = 0; j < SHAPE_HEIGHT; j++ )); do
             line=$line"${lines[$j]:$i:1}"
         done
         SHAPE_LINES_3+=( "$line" )
@@ -272,12 +272,11 @@ get_heap_height() {
 render_heap() {
     local from=${1:?}
     local to=${2:?}
-
     new_canvas
-    for (( i=0; i<$STAGE_WIDTH; i++ )); do
-        for (( j=$from; j<=$to; j++ )); do
+    for (( i = 0; i < STAGE_WIDTH; i++ )); do
+        for (( j = from; j <= to; j++ )); do
             local heap_item; get_heap_item $i $j
-            local placeholder; [ $heap_item -ne $TRANSPARENT ] && placeholder="$PLACEHOLDER" || placeholder=" "
+            local placeholder; (( heap_item != $TRANSPARENT )) && placeholder="$PLACEHOLDER" || placeholder=" "
             set_canvas_cursor_at $(( STAGE_BOTTOM - j - 1 )) $(( STAGE_LEFT + i + 1 ))
             set_canvas_foreground $heap_item
             add_canvas_format "%s" "$placeholder"
@@ -294,17 +293,17 @@ is_heap_hit() {
 
     eval "local shape_lines=( \"\${SHAPE_LINES_$SHAPE_ROTATION[@]}\" )"
 
-    for (( i=0; i<$SHAPE_ACTUAL_WIDTH; i++ )); do
+    for (( i = 0; i < SHAPE_ACTUAL_WIDTH; i++ )); do
         local heap_i; (( heap_i = left - STAGE_LEFT + i - 1 ))
         local heap_height; get_heap_height $heap_i
         local heap_top; (( heap_top = STAGE_BOTTOM - heap_height ))
-        [ $heap_top -lt $top ] && heap_top=$top
-        for (( j=$heap_top; j<=$bottom; j++ )); do
+        (( heap_top < top )) && heap_top=$top
+        for (( j = heap_top; j <= bottom; j++ )); do
             local line_j; (( line_j = j - top ))
             local heap_j; (( heap_j = STAGE_BOTTOM - j - 1 ))
             local shape_line="${shape_lines[$line_j]}"
             local heap_item; get_heap_item $heap_i $heap_j
-            ([ "${shape_line:$i:1}" != "." ] && [ $heap_item -ne $TRANSPARENT ]) && return 0
+            ([ "${shape_line:$i:1}" != "." ] && (( heap_item != $TRANSPARENT ))) && return 0
         done
     done
     return 1
@@ -312,18 +311,18 @@ is_heap_hit() {
 
 update_heap() {
     eval "local shape_lines=( \"\${SHAPE_LINES_$SHAPE_ROTATION[@]}\" )"
-    for (( i=0; i<$SHAPE_ACTUAL_WIDTH; i++ )); do
+    for (( i = 0; i < SHAPE_ACTUAL_WIDTH; i++ )); do
         local heap_i; (( heap_i = SHAPE_COL - STAGE_LEFT + i - 1 ))
         local heap_height; get_heap_height $heap_i
 
         local j=0
-        for (( ; j<$SHAPE_ACTUAL_HEIGHT; j++ )); do
+        for (( ; j < SHAPE_ACTUAL_HEIGHT; j++ )); do
             local shape_line="${shape_lines[$j]}"
             [ "${shape_line:$i:1}" != "." ] && break
         done
 
         local heap_j
-        for (( ; j<$SHAPE_ACTUAL_HEIGHT; j++ )); do
+        for (( ; j < SHAPE_ACTUAL_HEIGHT; j++ )); do
             (( heap_j = STAGE_BOTTOM - SHAPE_ROW - j - 1 ))
             local shape_line="${shape_lines[$j]}"
             if [ "${shape_line:$i:1}" != "." ]; then
@@ -336,7 +335,7 @@ update_heap() {
             fi
         done
 
-        for (( k=$heap_j-1; k>=$heap_height; k-- )); do
+        for (( k = heap_j - 1; k >= heap_height; k-- )); do
             set_heap_item $heap_i $k $TRANSPARENT
         done
     done
@@ -346,7 +345,7 @@ shrink_heap() {
     calc_heap_height
 
     local row=
-    for (( j=0; j<HEAP_HEIGHT; j++ )); do
+    for (( j = 0; j < HEAP_HEIGHT; j++ )); do
         [ ${HEAP_WIDTH[$j]} -eq $STAGE_WIDTH ] && {
             row=$j
             break
@@ -355,16 +354,16 @@ shrink_heap() {
 
     [ -z "$row" ] && return 1
 
-    for (( (( j = HEAP_HEIGHT - 1)); j>=$row; j-- )); do
+    for (( (( j = HEAP_HEIGHT - 1)); j >= $row; j-- )); do
         [ ${HEAP_WIDTH[$j]} -eq $STAGE_WIDTH ] && {
             unset HEAP_WIDTH[$j]
-            for (( i=0; i<$STAGE_WIDTH; i++ )); do
+            for (( i = 0; i < $STAGE_WIDTH; i++ )); do
                 eval "unset HEAP_$i[$j]"
             done
         }
     done
 
-    for (( i=0; i<$STAGE_WIDTH; i++ )); do
+    for (( i = 0; i < STAGE_WIDTH; i++ )); do
         eval "HEAP_$i=( \"\${HEAP_$i[@]}\" )"
     done
     HEAP_WIDTH=( "${HEAP_WIDTH[@]}" )
@@ -445,7 +444,7 @@ render_stage() {
     new_canvas
     set_canvas_foreground $WHITE
     set_canvas_cursor_at $STAGE_TOP $STAGE_LEFT
-    for (( i = 0; i<$STAGE_HEIGHT; i++ )); do
+    for (( i = 0; i < STAGE_HEIGHT; i++ )); do
         add_canvas_format_line "$line"
     done
 
