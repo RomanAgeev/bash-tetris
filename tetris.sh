@@ -53,6 +53,8 @@ for (( i=0; i<$STAGE_WIDTH; i++ )); do
     eval "HEAP_$i=()"
 done
 
+INIT_TIMEOUT_MS=300
+
 hide_cursor() {
     printf "$CUR_HIDE"
 }
@@ -503,27 +505,26 @@ drop_shape_down() {
     next_shape
 }
 
-to_seconds() {
-    eval "${2:?}=\$( bc <<< \"scale=3; ${1:?} / 1000\" )"
+to_timeout_sec() {
+    [ $1 -ge 1000 ] && TIMEOUT_SEC="${1%???}.${1: -3}" || printf -v TIMEOUT_SEC "0.%03d" $1
 }
 
 loop() {
     local on_action="${1:?}"
     local on_timeout="${2:?}"
-    local initial_timeout_ms="${3:-1000}"
 
-    local timeout_ms="$initial_timeout_ms"
+    local timeout_ms="$INIT_TIMEOUT_MS"
 
     while :; do
         local before_ms=$( gdate +%s%3N )
-        local _timeout; to_seconds "$timeout_ms" _timeout
+        to_timeout_sec "$timeout_ms"
 
         while :; do
-            read -sn 1 -t "$_timeout" key || {
+            read -sn 1 -t "$TIMEOUT_SEC" key || {
                 "$on_timeout"
-                timeout_ms="$initial_timeout_ms"
+                timeout_ms="$INIT_TIMEOUT_MS"
                 before_ms=$( gdate +%s%3N )
-                to_seconds "$timeout_ms" _timeout
+                to_timeout_sec "$timeout_ms"
                 continue
             }
 
@@ -548,4 +549,4 @@ hide_cursor
 render_stage
 next_shape
 
-loop on_action on_timeout 500
+loop on_action on_timeout
