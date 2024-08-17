@@ -431,6 +431,10 @@ calc_shape_actual_size() {
     }
 }
 
+calc_heap_height() {
+    HEAP_HEIGHT=${#HEAP_WIDTH[@]}
+}
+
 render_stage() {
     local line;
     printf -v line "$WALL_LEFT%$STAGE_WIDTH.${STAGE_WIDTH}s$WALL_RIGHT" " "
@@ -490,18 +494,28 @@ try_move_shape_down() {
 }
 
 drop_shape_down() {
+    local shape_row_before=$SHAPE_ROW
+
+    calc_heap_height
+    local shape_bottom; (( shape_bottom = SHAPE_ROW + SHAPE_ACTUAL_HEIGHT ))
+    local heap_top; (( heap_top = STAGE_BOTTOM - HEAP_HEIGHT ))
+    (( shape_bottom < heap_top )) && (( SHAPE_ROW = heap_top - SHAPE_ACTUAL_HEIGHT ))
+
     move_shape_down
     while (! is_shape_down && ! is_heap_hit); do
         move_shape_down
     done
     move_shape_up
-    clear_shape
+
+    (( SHAPE_ROW != shape_row_before )) && clear_shape
+
     update_heap
     shrink_heap_cascade
     next_shape
 }
 
 to_timeout_sec() {
+    [ $TIMEOUT_MS -lt 0 ] && TIMEOUT_MS=0
     [ $TIMEOUT_MS -ge 1000 ] && TIMEOUT_SEC="${TIMEOUT_MS%???}.${TIMEOUT_MS: -3}" || printf -v TIMEOUT_SEC "0.%03d" $TIMEOUT_MS
 }
 
@@ -517,6 +531,8 @@ reset_fg
 hide_cursor
 render_stage
 next_shape
+
+calc_heap_height
 
 TIMEOUT_MS=$INIT_TIMEOUT_MS
 while :; do
