@@ -53,7 +53,7 @@ for (( i=0; i<$STAGE_WIDTH; i++ )); do
     eval "HEAP_$i=()"
 done
 
-INIT_TIMEOUT_MS=300
+INIT_TIMEOUT_MS=500
 
 hide_cursor() {
     printf "$CUR_HIDE"
@@ -450,7 +450,7 @@ render_stage() {
     render_canvas
 }
 
-on_action() {
+on_key_press() {
     case $1 in
         A) try_rotate_shape ;;
         B) try_move_shape_down ;;
@@ -460,10 +460,6 @@ on_action() {
         q) exit ;;
         *) return 1 ;;
     esac
-}
-
-on_timeout() {
-    try_move_shape_down
 }
 
 try_rotate_shape() {
@@ -506,34 +502,7 @@ drop_shape_down() {
 }
 
 to_timeout_sec() {
-    [ $1 -ge 1000 ] && TIMEOUT_SEC="${1%???}.${1: -3}" || printf -v TIMEOUT_SEC "0.%03d" $1
-}
-
-loop() {
-    local on_action="${1:?}"
-    local on_timeout="${2:?}"
-
-    local timeout_ms="$INIT_TIMEOUT_MS"
-
-    while :; do
-        local before_ms=$( gdate +%s%3N )
-        to_timeout_sec "$timeout_ms"
-
-        while :; do
-            read -sn 1 -t "$TIMEOUT_SEC" key || {
-                "$on_timeout"
-                timeout_ms="$INIT_TIMEOUT_MS"
-                before_ms=$( gdate +%s%3N )
-                to_timeout_sec "$timeout_ms"
-                continue
-            }
-
-            "$on_action" "$key" && break
-        done
-
-        local after_ms=$( gdate +%s%3N )
-        (( timeout_ms = timeout_ms - after_ms + before_ms ))
-    done
+    [ $TIMEOUT_MS -ge 1000 ] && TIMEOUT_SEC="${TIMEOUT_MS%???}.${TIMEOUT_MS: -3}" || printf -v TIMEOUT_SEC "0.%03d" $TIMEOUT_MS
 }
 
 on_exit() {
@@ -549,4 +518,20 @@ hide_cursor
 render_stage
 next_shape
 
-loop on_action on_timeout
+TIMEOUT_MS=$INIT_TIMEOUT_MS
+while :; do
+    TS_BEFORE=$( gdate +%s%3N )
+    to_timeout_sec
+    while :; do
+        read -sn 1 -t $TIMEOUT_SEC key || {
+            try_move_shape_down
+            TIMEOUT_MS=$INIT_TIMEOUT_MS
+            TS_BEFORE=$( gdate +%s%3N )
+            to_timeout_sec
+            continue
+        }
+        on_key_press "$key" && break
+    done
+    TS_AFTER=$( gdate +%s%3N )
+    (( TIMEOUT_MS = TIMEOUT_MS - TS_AFTER + TS_BEFORE ))
+done
