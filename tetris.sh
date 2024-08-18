@@ -67,6 +67,8 @@ reset_fg() {
     printf "$FG" "$BLACK"
 }
 
+#--------- Begin Canvas ---------#
+
 new_canvas() {
     CANVAS=
 }
@@ -103,6 +105,10 @@ append_canvas_suffix() {
     local suffix; (( $# > 0 )) && printf -v suffix "$format" "$@" || suffix="$format"
     CANVAS="$CANVAS$suffix"
 }
+
+#--------- End Canvas ---------#
+
+#--------- Begin Shape ---------#
 
 new_shape() {
     local string="${1:?}"
@@ -250,6 +256,20 @@ init_shape_lines_3() {
     done
 }
 
+calc_shape_actual_size() {
+    [ $(( SHAPE_ROTATION % 2 )) -eq 0 ] && {
+        SHAPE_ACTUAL_WIDTH=$SHAPE_WIDTH
+        SHAPE_ACTUAL_HEIGHT=$SHAPE_HEIGHT
+    } || {
+        SHAPE_ACTUAL_WIDTH=$SHAPE_HEIGHT
+        SHAPE_ACTUAL_HEIGHT=$SHAPE_WIDTH
+    }
+}
+
+#--------- End Shape ---------#
+
+#--------- Begin Heap ---------#
+
 set_heap_item() {
     eval "HEAP_${1:?}[${2:?}]=\"\${3:?}\""
 }
@@ -264,6 +284,10 @@ has_heap_item() {
 
 get_heap_height() {
     eval "heap_height=\${#HEAP_${1:?}[@]}"
+}
+
+calc_heap_max_height() {
+    HEAP_MAX_HEIGHT=${#HEAP_WIDTH[@]}
 }
 
 render_heap() {
@@ -341,10 +365,10 @@ update_heap() {
 }
 
 shrink_heap() {
-    calc_heap_height
+    calc_heap_max_height
 
     local row=
-    for (( j = 0; j < HEAP_HEIGHT; j++ )); do
+    for (( j = 0; j < HEAP_MAX_HEIGHT; j++ )); do
         [ ${HEAP_WIDTH[$j]} -eq $STAGE_WIDTH ] && {
             row=$j
             break
@@ -353,7 +377,7 @@ shrink_heap() {
 
     [ -z "$row" ] && return 1
 
-    for (( (( j = HEAP_HEIGHT - 1)); j >= $row; j-- )); do
+    for (( (( j = HEAP_MAX_HEIGHT - 1)); j >= $row; j-- )); do
         [ ${HEAP_WIDTH[$j]} -eq $STAGE_WIDTH ] && {
             unset HEAP_WIDTH[$j]
             for (( i = 0; i < $STAGE_WIDTH; i++ )); do
@@ -369,11 +393,36 @@ shrink_heap() {
 }
 
 shrink_heap_cascade() {
-    calc_heap_height
-    local heap_height_before=$HEAP_HEIGHT
+    calc_heap_max_height
+    local heap_max_height=$HEAP_MAX_HEIGHT
     while shrink_heap; do (:); done
-    render_heap 0 $(( heap_height_before - 1 ))
+    render_heap 0 $(( heap_max_height - 1 ))
 }
+
+#--------- End Heap ---------#
+
+#--------- Begin Stage ---------#
+
+render_stage() {
+    local line;
+    printf -v line "$WALL_LEFT%$STAGE_WIDTH.${STAGE_WIDTH}s$WALL_RIGHT" " "
+
+    new_canvas
+    set_canvas_foreground $WHITE
+    set_canvas_cursor_at $STAGE_TOP $STAGE_LEFT
+    for (( i = 0; i < STAGE_HEIGHT; i++ )); do
+        add_canvas_format_line "$line"
+    done
+
+    local bottom_line;
+    printf -v bottom_line " %$STAGE_WIDTH.${STAGE_WIDTH}s " " "
+    bottom_line="${bottom_line// /$FLOOR}"
+    add_canvas_format_line "$bottom_line"
+
+    render_canvas
+}
+
+#--------- End Stage ---------#
 
 next_shape() {
     local shape_index; (( shape_index = RANDOM % ${#SHAPES[@]} ))
@@ -438,51 +487,6 @@ is_shape_right() {
     [ $(( SHAPE_COL + SHAPE_ACTUAL_WIDTH )) -gt $STAGE_RIGHT ]
 }
 
-calc_shape_actual_size() {
-    [ $(( SHAPE_ROTATION % 2 )) -eq 0 ] && {
-        SHAPE_ACTUAL_WIDTH=$SHAPE_WIDTH
-        SHAPE_ACTUAL_HEIGHT=$SHAPE_HEIGHT
-    } || {
-        SHAPE_ACTUAL_WIDTH=$SHAPE_HEIGHT
-        SHAPE_ACTUAL_HEIGHT=$SHAPE_WIDTH
-    }
-}
-
-calc_heap_height() {
-    HEAP_HEIGHT=${#HEAP_WIDTH[@]}
-}
-
-render_stage() {
-    local line;
-    printf -v line "$WALL_LEFT%$STAGE_WIDTH.${STAGE_WIDTH}s$WALL_RIGHT" " "
-
-    new_canvas
-    set_canvas_foreground $WHITE
-    set_canvas_cursor_at $STAGE_TOP $STAGE_LEFT
-    for (( i = 0; i < STAGE_HEIGHT; i++ )); do
-        add_canvas_format_line "$line"
-    done
-
-    local bottom_line;
-    printf -v bottom_line " %$STAGE_WIDTH.${STAGE_WIDTH}s " " "
-    bottom_line="${bottom_line// /$FLOOR}"
-    add_canvas_format_line "$bottom_line"
-
-    render_canvas
-}
-
-on_key_press() {
-    case $1 in
-        A) try_rotate_shape ;;
-        B) try_move_shape_down ;;
-        C) try_move_shape_right ;;
-        D) try_move_shape_left ;;
-        '') drop_shape_down ;;
-        q) exit ;;
-        *) return 1 ;;
-    esac
-}
-
 try_rotate_shape() {
     rotate_shape_right
     (is_shape_right || is_shape_left || is_heap_hit) &&  rotate_shape_left || render_shape
@@ -513,9 +517,9 @@ try_move_shape_down() {
 drop_shape_down() {
     local shape_row_before=$SHAPE_ROW
 
-    calc_heap_height
+    calc_heap_max_height
     local shape_bottom; (( shape_bottom = SHAPE_ROW + SHAPE_ACTUAL_HEIGHT ))
-    local heap_top; (( heap_top = STAGE_BOTTOM - HEAP_HEIGHT ))
+    local heap_top; (( heap_top = STAGE_BOTTOM - HEAP_MAX_HEIGHT ))
     (( shape_bottom < heap_top )) && (( SHAPE_ROW = heap_top - SHAPE_ACTUAL_HEIGHT ))
 
     move_shape_down
@@ -536,6 +540,18 @@ to_timeout_sec() {
     [ $TIMEOUT_MS -ge 1000 ] && TIMEOUT_SEC="${TIMEOUT_MS%???}.${TIMEOUT_MS: -3}" || printf -v TIMEOUT_SEC "0.%03d" $TIMEOUT_MS
 }
 
+on_key_press() {
+    case $1 in
+        A) try_rotate_shape ;;
+        B) try_move_shape_down ;;
+        C) try_move_shape_right ;;
+        D) try_move_shape_left ;;
+        '') drop_shape_down ;;
+        q) exit ;;
+        *) return 1 ;;
+    esac
+}
+
 on_exit() {
     clear
     show_cursor
@@ -548,8 +564,6 @@ reset_fg
 hide_cursor
 render_stage
 next_shape
-
-calc_heap_height
 
 TIMEOUT_MS=$INIT_TIMEOUT_MS
 while :; do
