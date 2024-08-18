@@ -107,8 +107,6 @@ append_canvas_suffix() {
 new_shape() {
     local string="${1:?}"
     local color="${2:?}"
-    local row="${3:?}"
-    local col="${4:?}"
 
     local lines
     local IFS
@@ -132,8 +130,6 @@ new_shape() {
     init_shape_format 3 "${lines[@]}"
 
     SHAPE_CANVAS=
-    SHAPE_ROW=$row
-    SHAPE_COL=$col
     SHAPE_ROTATION=0
     SHAPE_COLOR="$color"
 
@@ -143,6 +139,8 @@ new_shape() {
         SHAPE_PLACEHOLDERS+=( "$PLACEHOLDER" )
         SHAPE_SPACES+=( " " )
     done
+
+    calc_shape_actual_size
 }
 
 render_shape() {
@@ -380,9 +378,14 @@ shrink_heap_cascade() {
 next_shape() {
     local shape_index; (( shape_index = RANDOM % ${#SHAPES[@]} ))
     local color_index; (( color_index = RANDOM % ${#COLORS[@]} ))
-    new_shape "${SHAPES[$shape_index]}" "${COLORS[$color_index]}" $STAGE_TOP $(( STAGE_LEFT + STAGE_WIDTH / 2 ))
-    calc_shape_actual_size
+    new_shape "${SHAPES[$shape_index]}" "${COLORS[$color_index]}"
+    move_shape_start
     render_shape
+}
+
+move_shape_start() {
+    (( SHAPE_ROW = STAGE_TOP ))
+    (( SHAPE_COL = STAGE_LEFT + STAGE_WIDTH / 2 ))
 }
 
 move_shape_right() {
