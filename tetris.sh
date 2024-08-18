@@ -418,6 +418,8 @@ render_stage() {
     printf -v bottom_line " %$STAGE_WIDTH.${STAGE_WIDTH}s " " "
     bottom_line="${bottom_line// /$FLOOR}"
     add_canvas_format_line "$bottom_line"
+    add_canvas_format_line "Press <p> for pause/unpause."
+    add_canvas_format_line "Press <q> for exit."
 
     render_canvas
 }
@@ -434,8 +436,8 @@ next_shape() {
 
 game_over() {
     new_canvas
-    set_canvas_foreground "$WHITE"
-    set_canvas_cursor_at $(( STAGE_BOTTOM + 1 )) $(( STAGE_LEFT ))
+    set_canvas_foreground "$RED"
+    set_canvas_cursor_at $(( STAGE_BOTTOM + 4 )) $(( STAGE_LEFT ))
     add_canvas_format_line "GAME OVER !"
     add_canvas_format_line "Press any key to exit..."
     render_canvas
@@ -540,6 +542,14 @@ to_timeout_sec() {
     [ $TIMEOUT_MS -ge 1000 ] && TIMEOUT_SEC="${TIMEOUT_MS%???}.${TIMEOUT_MS: -3}" || printf -v TIMEOUT_SEC "0.%03d" $TIMEOUT_MS
 }
 
+flip_paused() {
+    is_paused && unset PAUSE || PAUSE=Y
+}
+
+is_paused() {
+    [ -n "${PAUSE-}" ]
+}
+
 on_key_press() {
     case $1 in
         A) try_rotate_shape ;;
@@ -547,7 +557,6 @@ on_key_press() {
         C) try_move_shape_right ;;
         D) try_move_shape_left ;;
         '') drop_shape_down ;;
-        q) exit ;;
         *) return 1 ;;
     esac
 }
@@ -571,13 +580,15 @@ while :; do
     to_timeout_sec
     while :; do
         read -sn 1 -t $TIMEOUT_SEC key || {
-            try_move_shape_down
+            is_paused || try_move_shape_down
             TIMEOUT_MS=$INIT_TIMEOUT_MS
             TS_BEFORE=$( gdate +%s%3N )
             to_timeout_sec
             continue
         }
-        on_key_press "$key" && break
+        [[ "$key" =~ q|Q ]] && exit
+        [[ "$key" =~ p|P ]] && flip_paused
+        is_paused || on_key_press "$key" && break
     done
     TS_AFTER=$( gdate +%s%3N )
     (( TIMEOUT_MS = TIMEOUT_MS - TS_AFTER + TS_BEFORE ))
