@@ -109,7 +109,6 @@ new_shape() {
     local color="${2:?}"
     local row="${3:?}"
     local col="${4:?}"
-    local placeholder="${5:?}"
 
     local lines
     local IFS
@@ -141,7 +140,7 @@ new_shape() {
     SHAPE_PLACEHOLDERS=()
     SHAPE_SPACES=()
     for (( i = 0; i < SHAPE_LENGTH; i++ )); do
-        SHAPE_PLACEHOLDERS+=( "$placeholder" )
+        SHAPE_PLACEHOLDERS+=( "$PLACEHOLDER" )
         SHAPE_SPACES+=( " " )
     done
 }
@@ -381,7 +380,7 @@ shrink_heap_cascade() {
 next_shape() {
     local shape_index; (( shape_index = RANDOM % ${#SHAPES[@]} ))
     local color_index; (( color_index = RANDOM % ${#COLORS[@]} ))
-    new_shape "${SHAPES[$shape_index]}" "${COLORS[$color_index]}" $STAGE_TOP $(( STAGE_LEFT + STAGE_WIDTH / 2 )) "$PLACEHOLDER"
+    new_shape "${SHAPES[$shape_index]}" "${COLORS[$color_index]}" $STAGE_TOP $(( STAGE_LEFT + STAGE_WIDTH / 2 ))
     calc_shape_actual_size
     render_shape
 }
