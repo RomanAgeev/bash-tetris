@@ -380,7 +380,18 @@ next_shape() {
     local color_index; (( color_index = RANDOM % ${#COLORS[@]} ))
     new_shape "${SHAPES[$shape_index]}" "${COLORS[$color_index]}"
     move_shape_start
-    render_shape
+    is_heap_hit && game_over || render_shape
+}
+
+game_over() {
+    new_canvas
+    set_canvas_foreground "$WHITE"
+    set_canvas_cursor_at $(( STAGE_BOTTOM + 1 )) $(( STAGE_LEFT ))
+    add_canvas_format_line "GAME OVER !"
+    add_canvas_format_line "Press any key to exit..."
+    render_canvas
+    read -sn 1
+    exit 0
 }
 
 move_shape_start() {
