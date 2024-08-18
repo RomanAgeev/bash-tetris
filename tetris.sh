@@ -321,6 +321,8 @@ update_heap() {
             [ "${shape_line:$i:1}" != "." ] && break
         done
 
+        (( j == SHAPE_ACTUAL_HEIGHT )) && continue
+
         local heap_j
         for (( ; j < SHAPE_ACTUAL_HEIGHT; j++ )); do
             (( heap_j = STAGE_BOTTOM - SHAPE_ROW - j - 1 ))
