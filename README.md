@@ -1,3 +1,4 @@
 # bash-tetris
 A simple Tetris game written exclusively in bash.
-![screenshot](bash-tetris.png)
+
+<img src="bash-tetris.png" width="300px"/>
